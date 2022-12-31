@@ -3,7 +3,7 @@
 	"display": "Node 18",
 
 	"compilerOptions": {
-		"lib": ["es2022"],
+		"lib": ["es2022", "DOM"],
 		"module": "ES2022",
 		"target": "es2022",
 		"strict": false,
