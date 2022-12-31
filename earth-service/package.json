@@ -1,0 +1,18 @@
+{
+	"dependencies": {
+		"@aws-sdk/client-cognito-identity-provider": "^3.241.0",
+		"@aws-sdk/client-dynamodb": "^3.241.0",
+		"@aws-sdk/client-s3": "^3.241.0",
+		"nanoid": "^4.0.0"
+	},
+	"name": "earth-service",
+	"description": "**Earth** handles the storage and processing of information related to the user and stores it within the DynamoDB.",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "ISC",
+	"type": "module"
+}
