@@ -1,0 +1,19 @@
+{
+	"name": "jupiter-service",
+	"version": "1.0.0",
+	"description": "**Jupiter** handles the storage and processing of mod pages between the client, Io Service and Jupiter's DynamoDB.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"dependencies": {
+		"@aws-sdk/client-dynamodb": "^3.241.0",
+		"@aws-sdk/client-s3": "^3.241.0",
+		"@aws-sdk/lib-dynamodb": "^3.241.0",
+		"nanoid": "^4.0.0"
+	}
+}
