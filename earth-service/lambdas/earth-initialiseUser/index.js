@@ -63,7 +63,7 @@ const createDDdbUserEntry = async (sub, userName) => {
 	const params = {
 		TableName: "users",
 		Item: {
-			id: sub,
+			user_id: sub,
 			username: userName,
 		},
 	}

@@ -18,7 +18,7 @@ export const handler = async (event) => {
 	}
 
 	const body = JSON.parse(event.body)
-	const userId = body.id
+	const userId = body.user_id
 
 	console.log("body", body)
 
@@ -35,7 +35,7 @@ export const handler = async (event) => {
 }
 
 const updateUser = async (userId, body) => {
-	const itemKeys = Object.keys(body).filter((k) => k !== "id")
+	const itemKeys = Object.keys(body).filter((k) => k !== "user_id")
 
 	const params = {
 		TableName: "users",
@@ -55,7 +55,7 @@ const updateUser = async (userId, body) => {
 			{}
 		),
 		Key: {
-			id: userId,
+			user_id: userId,
 		},
 		ReturnValues: "ALL_NEW",
 	}
