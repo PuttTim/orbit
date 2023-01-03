@@ -6,18 +6,15 @@ const REGION = "us-east-1"
 const s3Client = new S3Client({ region: REGION })
 
 export const handler = async (event) => {
-	// TODO implement
-	const response = {
-		statusCode: 200,
-		body: JSON.stringify("Hello from Lambda!"),
-	}
-
-	const key = event.pathParameters.modId
+	const key = event.pathParameters.mod_id
 
 	const signedUrl = await createSignedUrl(key)
 
+	console.log(key)
+	console.log(signedUrl)
+
 	return {
-		...response,
+		statusCode: 200,
 		body: JSON.stringify(signedUrl),
 	}
 }
@@ -27,6 +24,9 @@ const createSignedUrl = async (key) => {
 		Bucket: "orbit-image",
 		Key: `thumbnail/${key}/icon.png`,
 		ContentType: "image/png",
+		Metadata: {
+			"Content-Type": "image/png",
+		},
 	})
 
 	const signedUrl = await getSignedUrl(s3Client, command, {
@@ -36,4 +36,4 @@ const createSignedUrl = async (key) => {
 	return signedUrl
 }
 
-// await handler({ pathParameters: { modId: "211dd2608ae2" } }).then((res) => console.log(JSON.parse(res.body)))
+// console.log(await handler({ pathParameters: { modId: "211dd2608ae2" } }))
