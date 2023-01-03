@@ -12,8 +12,6 @@ const unmarshallOptions = { wrapNumbers: false }
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient, { marshallOptions, unmarshallOptions })
 
 export const handler = async (event) => {
-	// TODO implement
-
 	const modId = nanoid(12)
 
 	const res = await insertMod(modId, JSON.parse(event.body))
