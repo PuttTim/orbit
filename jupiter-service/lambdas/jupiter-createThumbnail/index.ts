@@ -36,4 +36,4 @@ const createSignedUrl = async (key) => {
 	return signedUrl
 }
 
-console.log(await handler({ pathParameters: { modId: "211dd2608ae2" } }))
+// await handler({ pathParameters: { modId: "211dd2608ae2" } }).then((res) => console.log(JSON.parse(res.body)))
