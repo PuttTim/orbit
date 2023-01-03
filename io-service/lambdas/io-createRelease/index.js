@@ -55,13 +55,13 @@ const insertRelease = async (mod_id, version_id, releaseData) => {
 	}
 }
 
-await handler({
-	pathParameters: {
-		mod_id: "7d01f55d95eb",
-	},
-	body: JSON.stringify({
-		game_version: "1.19.3",
-		mod_version: "0.10.4",
-		stage: "beta",
-	}),
-}).then((data) => [console.log(data)])
+// await handler({
+// 	pathParameters: {
+// 		mod_id: "7d01f55d95eb",
+// 	},
+// 	body: JSON.stringify({
+// 		game_version: "1.19.3",
+// 		mod_version: "0.10.4",
+// 		stage: "beta",
+// 	}),
+// }).then((data) => [console.log(data)])
