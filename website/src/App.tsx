@@ -12,7 +12,7 @@ function App() {
 
     return (
         <>
-            <Box maw={"1300px"} m="auto" pt="16px">
+            <Box maw={"1300px"} m="auto" mb="32px" pt="16px">
                 <Navbar />
                 <Routes>
                     <Route path="/" element={<Home />} />
