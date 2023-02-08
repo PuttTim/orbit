@@ -144,25 +144,37 @@ const Home = () => {
                                 <Box w="30%">
                                     <Text fz="xl">{creatorOffer.title}</Text>
                                     {creatorOffer.points.map(point => (
-                                        <>
-                                            <Text fz="lg" mt="8px">
-                                                {`${
-                                                    point.status ? "✅" : "❌"
-                                                } ${point.text}`}
-                                            </Text>
-                                        </>
+                                        <Text fz="lg" mt="8px">
+                                            <Text
+                                                span
+                                                color={
+                                                    point.status
+                                                        ? "#98E37D"
+                                                        : "#AF5456"
+                                                }>
+                                                {" "}
+                                                {point.status ? "✔" : "✖"}
+                                            </Text>{" "}
+                                            {point.text}
+                                        </Text>
                                     ))}
                                 </Box>
                                 <Box w="30%">
                                     <Text fz="xl">{playerOffer.title}</Text>
                                     {playerOffer.points.map(point => (
-                                        <>
-                                            <Text fz="lg" mt="8px">
-                                                {`${
-                                                    point.status ? "✅" : "❌"
-                                                } ${point.text}`}
-                                            </Text>
-                                        </>
+                                        <Text fz="lg" mt="8px">
+                                            <Text
+                                                span
+                                                color={
+                                                    point.status
+                                                        ? "#98E37D"
+                                                        : "#AF5456"
+                                                }>
+                                                {" "}
+                                                {point.status ? "✔" : "✖"}
+                                            </Text>{" "}
+                                            {point.text}
+                                        </Text>
                                     ))}
                                 </Box>
                             </Flex>
