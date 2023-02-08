@@ -1,8 +1,8 @@
-import { Button, Container, Paper, Text } from "@mantine/core"
+import { Button, Box, Stack, Container, Paper, Text } from "@mantine/core"
 
 const Home = () => {
     return (
-        <div>
+        <Box w="100%">
             <Text>
                 Gravitate to 00 mods that
                 <Text span color="accent.9">
@@ -21,7 +21,7 @@ const Home = () => {
                 </Text>
                 <Button color="accent.2">Explore now!</Button>
             </Paper>
-        </div>
+        </Box>
     )
 }
 
