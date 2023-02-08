@@ -38,11 +38,11 @@ const Navbar = () => {
 
     return (
         <Box
-            h="80px"
+            h="50px"
             w="100%"
             bg="primary.9"
-            px="20px"
-            py="15"
+            px="15px"
+            py="30px"
             sx={{ borderRadius: "8px" }}>
             <Flex h="100%" w="100%" align="center" justify="space-between">
                 <Flex dir="row" align="center" columnGap="20px">
