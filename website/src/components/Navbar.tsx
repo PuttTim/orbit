@@ -90,12 +90,16 @@ const Navbar = () => {
                 </Flex>
                 <Flex>
                     <Button
-                        onClick={() =>
-                            window.open(
-                                "https://orbitapp.auth.us-east-1.amazoncognito.com/login?client_id=5osduaqufcophqc1cbkb2hqgpl&response_type=code&scope=email+openid+phone&redirect_uri=http://localhost:3000/auth/",
-                                "_self",
-                            )
-                        }
+                        onClick={() => {
+                            const URI = `https://orbitapp.auth.us-east-1.amazoncognito.com/login?client_id=5osduaqufcophqc1cbkb2hqgpl&response_type=code&scope=email+openid+phone&redirect_uri=${
+                                import.meta.env.DEV
+                                    ? "http://localhost:3000/auth/"
+                                    : "https://main.d2jcn6poen8bj9.amplifyapp.com/auth/"
+                            }`
+
+                            // console.log(URI)
+                            window.open(URI, "_self")
+                        }}
                         color="secondary.7">
                         <Text fw={700} fz="lg">
                             Login | Register
