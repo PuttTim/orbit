@@ -126,7 +126,50 @@ const Home = () => {
                 px="40px"
                 bg="primary.9"
                 sx={{ borderRadius: "8px" }}>
-                <Flex w="100%" justify="space-around">
+                <Flex direction="column">
+                    <Text fz={24} mb={24}>
+                        <Text span color="accent.9">
+                            Orbit
+                        </Text>{" "}
+                        offers you this:
+                    </Text>
+                    <Flex w="100%" justify="space-around">
+                        <Stack align="center" justify="center">
+                            {" "}
+                            <Image src={OfferImg} />
+                        </Stack>
+                        <Flex direction="column" w="100%">
+                            <Flex justify="space-evenly">
+                                {" "}
+                                <Box w="30%">
+                                    <Text fz="xl">{creatorOffer.title}</Text>
+                                    {creatorOffer.points.map(point => (
+                                        <>
+                                            <Text fz="lg" mt="8px">
+                                                {`${
+                                                    point.status ? "✅" : "❌"
+                                                } ${point.text}`}
+                                            </Text>
+                                        </>
+                                    ))}
+                                </Box>
+                                <Box w="30%">
+                                    <Text fz="xl">{playerOffer.title}</Text>
+                                    {playerOffer.points.map(point => (
+                                        <>
+                                            <Text fz="lg" mt="8px">
+                                                {`${
+                                                    point.status ? "✅" : "❌"
+                                                } ${point.text}`}
+                                            </Text>
+                                        </>
+                                    ))}
+                                </Box>
+                            </Flex>
+                        </Flex>
+                    </Flex>
+                </Flex>
+                {/* <Flex w="100%" justify="space-around">
                     <Stack align="center" justify="center">
                         {" "}
                         <Image src={OfferImg} />
@@ -166,7 +209,7 @@ const Home = () => {
                             </Box>
                         </Flex>
                     </Flex>
-                </Flex>
+                </Flex> */}
             </Box>
         </>
     )
