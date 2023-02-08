@@ -1,7 +1,41 @@
 import { Box, Button, Flex, Image, Stack, Text } from "@mantine/core"
 import Icon from "../assets/orbit_icon.svg"
+import theme from "../Theme"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+
+interface NavbarItems {
+    pageTitle: string
+    pageUrl: string
+}
+
+const pages: NavbarItems[] = [
+    {
+        pageTitle: "Home",
+        pageUrl: "",
+    },
+    {
+        pageTitle: "Mods",
+        pageUrl: "mods",
+    },
+]
 
 const Navbar = () => {
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [currentPath, setCurrentPath] = useState(
+        location.pathname.split("/")[location.pathname.split("/").length - 1],
+    )
+
+    useEffect(() => {
+        setCurrentPath(
+            location.pathname.split("/")[
+                location.pathname.split("/").length - 1
+            ],
+        )
+        console.log(currentPath === "" ? "Home" : currentPath)
+    }, [location])
+
     return (
         <Box
             h="80px"
@@ -10,7 +44,7 @@ const Navbar = () => {
             px="20px"
             py="15"
             sx={{ borderRadius: "8px" }}>
-            <Flex h="100%" w="100%" align="center">
+            <Flex h="100%" w="100%" align="center" justify="space-between">
                 <Flex dir="row" align="center" columnGap="20px">
                     <Image src={Icon} maw="40px" mah="40px" />
                     <Text
@@ -24,24 +58,48 @@ const Navbar = () => {
                         }}>
                         Orbit
                     </Text>
-                    <Button variant="subtle" color="dark.0">
-                        Home
-                    </Button>
-                    <Button
-                        variant="filled"
-                        styles={theme => ({
-                            root: {
-                                color: "dark.0",
-                                backgroundColor: "secondary.9",
-                                "&:hover": {
-                                    backgroundColor: theme.fn.darken(
-                                        "secondary.9",
-                                        0.05,
-                                    ),
+                    {pages.map(page => (
+                        <Button
+                            key={page.pageUrl}
+                            onClick={() => navigate(`/${page.pageUrl}`)}
+                            variant={
+                                page.pageUrl === currentPath
+                                    ? "filled"
+                                    : "subtle"
+                            }
+                            styles={theme => ({
+                                root: {
+                                    color: theme.colors.dark[0],
+                                    backgroundColor:
+                                        page.pageUrl === currentPath
+                                            ? theme.colors.secondary[7]
+                                            : theme.colors.dark[1],
+                                    "&:hover": {
+                                        backgroundColor:
+                                            theme.colors.secondary[8],
+                                    },
                                 },
-                            },
-                        })}>
-                        Mods
+                            })}>
+                            <Text
+                                fw={page.pageUrl === currentPath ? 700 : 500}
+                                fz="lg">
+                                {page.pageTitle}
+                            </Text>
+                        </Button>
+                    ))}
+                </Flex>
+                <Flex>
+                    <Button
+                        onClick={() =>
+                            window.open(
+                                "https://orbitapp.auth.us-east-1.amazoncognito.com/login?client_id=5osduaqufcophqc1cbkb2hqgpl&response_type=code&scope=email+openid+phone&redirect_uri=http://localhost:3000/auth/",
+                                "_self",
+                            )
+                        }
+                        color="secondary.7">
+                        <Text fw={700} fz="lg">
+                            Login | Register
+                        </Text>
                     </Button>
                 </Flex>
             </Flex>
