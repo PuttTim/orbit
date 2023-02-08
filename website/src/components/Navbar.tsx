@@ -91,7 +91,9 @@ const Navbar = () => {
                 <Flex>
                     <Button
                         onClick={() => {
-                            const URI = `https://orbitapp.auth.us-east-1.amazoncognito.com/login?client_id=5osduaqufcophqc1cbkb2hqgpl&response_type=code&scope=email+openid+phone&redirect_uri=${
+                            const URI = `${
+                                import.meta.env.VITE_ORBIT_AUTH_URI
+                            }${
                                 import.meta.env.DEV
                                     ? "http://localhost:3000/auth/"
                                     : "https://main.d2jcn6poen8bj9.amplifyapp.com/auth/"
