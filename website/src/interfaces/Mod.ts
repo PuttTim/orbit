@@ -23,3 +23,5 @@ interface Mod {
     env_tags: EnvTags[]
     category_tags: CategoryTags[]
 }
+
+export default Mod
