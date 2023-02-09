@@ -54,18 +54,28 @@ const Navbar = () => {
             sx={{ borderRadius: "8px" }}>
             <Flex h="100%" w="100%" align="center" justify="space-between">
                 <Flex dir="row" align="center" columnGap="20px">
-                    <Image src={Icon} maw="40px" mah="40px" />
-                    <Text
-                        fz="2rem"
-                        fw={700}
-                        variant="gradient"
-                        gradient={{
-                            from: "accent.9",
-                            to: "accent.6",
-                            deg: 45,
-                        }}>
-                        Orbit
-                    </Text>
+                    <Flex
+                        direction="row"
+                        gap="10px"
+                        align="center"
+                        onClick={() => {
+                            navigate(``)
+                        }}
+                        sx={{ borderRadius: "8px", cursor: "pointer" }}>
+                        <Image src={Icon} maw="40px" mah="40px" />
+                        <Text
+                            fz="2rem"
+                            fw={700}
+                            variant="gradient"
+                            gradient={{
+                                from: "accent.9",
+                                to: "accent.6",
+                                deg: 45,
+                            }}>
+                            Orbit
+                        </Text>{" "}
+                    </Flex>
+
                     {pages.map(page => (
                         <Button
                             key={page.pageUrl}
