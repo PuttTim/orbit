@@ -40,9 +40,9 @@ const Navbar = () => {
         console.log(currentPath === "" ? "Home" : currentPath)
     }, [location])
 
-    useEffect(() => {
-        console.log("navbar ud: ", userData)
-    }, [userData])
+    // useEffect(() => {
+    // console.log("navbar ud: ", userData)
+    // }, [userData])
 
     return (
         <Box

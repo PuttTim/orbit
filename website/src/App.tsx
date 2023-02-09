@@ -19,7 +19,7 @@ function App() {
 
         if (data) {
             const parsedData = JSON.parse(data)
-            console.log("data: ", parsedData)
+            // console.log("data: ", parsedData)
             if (parsedData.data.exp < Date.now()) {
                 setData(data)
             } else {
