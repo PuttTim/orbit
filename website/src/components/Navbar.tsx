@@ -3,6 +3,8 @@ import Icon from "../assets/orbit_icon.svg"
 import theme from "../Theme"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
+import { useAppStore } from "../app/store"
+import { Plus, User } from "react-feather"
 
 interface NavbarItems {
     pageTitle: string
@@ -26,6 +28,8 @@ const Navbar = () => {
     const [currentPath, setCurrentPath] = useState(
         location.pathname.split("/")[location.pathname.split("/").length - 1],
     )
+    const userData = useAppStore(state => state.data)
+    const wipeData = useAppStore(state => state.wipeData)
 
     useEffect(() => {
         setCurrentPath(
@@ -35,6 +39,10 @@ const Navbar = () => {
         )
         console.log(currentPath === "" ? "Home" : currentPath)
     }, [location])
+
+    useEffect(() => {
+        console.log("navbar ud: ", userData)
+    }, [userData])
 
     return (
         <Box
@@ -89,24 +97,54 @@ const Navbar = () => {
                     ))}
                 </Flex>
                 <Flex>
-                    <Button
-                        onClick={() => {
-                            const URI = `${
-                                import.meta.env.VITE_ORBIT_AUTH_URI
-                            }${
-                                import.meta.env.DEV
-                                    ? "http://localhost:3000/auth/"
-                                    : "https://main.d2jcn6poen8bj9.amplifyapp.com/auth/"
-                            }`
+                    {userData["cognito:username"] !== undefined ? (
+                        <>
+                            <Button
+                                leftIcon={<Plus />}
+                                color="accent.4"
+                                mr="20px">
+                                Create Project
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    wipeData()
+                                }}
+                                leftIcon={<User />}
+                                styles={theme => ({
+                                    root: {
+                                        color: theme.colors.dark[0],
+                                        backgroundColor:
+                                            theme.colors.secondary[7],
 
-                            // console.log(URI)
-                            window.open(URI, "_self")
-                        }}
-                        color="secondary.7">
-                        <Text fw={700} fz="lg">
-                            Login | Register
-                        </Text>
-                    </Button>
+                                        "&:hover": {
+                                            backgroundColor:
+                                                theme.colors.secondary[8],
+                                        },
+                                    },
+                                })}>
+                                {userData["cognito:username"]}
+                            </Button>
+                        </>
+                    ) : (
+                        <Button
+                            onClick={() => {
+                                const URI = `${
+                                    import.meta.env.VITE_ORBIT_AUTH_URI
+                                }${
+                                    import.meta.env.DEV
+                                        ? "http://localhost:3000/auth/"
+                                        : "https://main.d2jcn6poen8bj9.amplifyapp.com/auth/"
+                                }`
+
+                                // console.log(URI)
+                                window.open(URI, "_self")
+                            }}
+                            color="secondary.7">
+                            <Text fw={700} fz="lg">
+                                Login | Register
+                            </Text>
+                        </Button>
+                    )}
                 </Flex>
             </Flex>
         </Box>

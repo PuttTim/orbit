@@ -143,8 +143,8 @@ const Home = () => {
                                 {" "}
                                 <Box w="30%">
                                     <Text fz="xl">{creatorOffer.title}</Text>
-                                    {creatorOffer.points.map(point => (
-                                        <Text fz="lg" mt="8px">
+                                    {creatorOffer.points.map((point, i) => (
+                                        <Text key={i} fz="lg" mt="8px">
                                             <Text
                                                 span
                                                 color={
@@ -161,8 +161,8 @@ const Home = () => {
                                 </Box>
                                 <Box w="30%">
                                     <Text fz="xl">{playerOffer.title}</Text>
-                                    {playerOffer.points.map(point => (
-                                        <Text fz="lg" mt="8px">
+                                    {playerOffer.points.map((point, i) => (
+                                        <Text key={i} fz="lg" mt="8px">
                                             <Text
                                                 span
                                                 color={

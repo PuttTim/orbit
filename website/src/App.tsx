@@ -6,6 +6,7 @@ import Mods from "./pages/Mods"
 import Mod from "./pages/Mod"
 import PageNotFound from "./pages/PageNotFound"
 import Navbar from "./components/Navbar"
+import Auth from "./pages/Auth"
 
 function App() {
     const [count, setCount] = useState(0)
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/mods" element={<Mods />} />
                     <Route path="/mod/:mod_name" element={<Mod />} />
+                    <Route path="/auth" element={<Auth />} />
                     <Route path="*" element={<PageNotFound />} />
                 </Routes>
             </Box>
