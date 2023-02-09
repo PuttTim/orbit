@@ -1,11 +1,13 @@
 import { StateCreator } from "zustand"
 import jwt_decode from "jwt-decode"
+import { useLocalStorage } from "@mantine/hooks"
 
 export interface AuthSlice {
     token: string
     data: any
     fetchToken: (token: string) => void
     wipeData: () => void
+    setData: (data: any) => void
 }
 
 export const createAuthSlice: StateCreator<AuthSlice> = set => ({
@@ -38,11 +40,23 @@ export const createAuthSlice: StateCreator<AuthSlice> = set => ({
                 res.json().then(data => {
                     const decodedData = jwt_decode(data.id_token)
                     set({ token: data.access_token, data: decodedData })
+                    localStorage.setItem(
+                        "userData",
+                        JSON.stringify({
+                            access_token: data.id_token,
+                            data: decodedData,
+                        }),
+                    )
                 })
             })
         } catch {}
     },
     wipeData: () => {
         set({ token: "", data: {} })
+        localStorage.removeItem("userData")
+    },
+    setData: (data: any) => {
+        const parsedData = JSON.parse(data)
+        set({ token: parsedData.access_token, data: parsedData.data })
     },
 })

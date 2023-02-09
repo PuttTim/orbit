@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button, Box, Text, Paper, Center, Flex } from "@mantine/core"
 import { Route, Routes } from "react-router-dom"
 import Home from "./pages/Home"
@@ -7,9 +7,26 @@ import Mod from "./pages/Mod"
 import PageNotFound from "./pages/PageNotFound"
 import Navbar from "./components/Navbar"
 import Auth from "./pages/Auth"
+import { useLocalStorage } from "@mantine/hooks"
+import { useAppStore } from "./app/store"
 
 function App() {
-    const [count, setCount] = useState(0)
+    const setData = useAppStore(state => state.setData)
+    const wipeData = useAppStore(state => state.wipeData)
+
+    useEffect(() => {
+        const data = localStorage.getItem("userData")
+
+        if (data) {
+            const parsedData = JSON.parse(data)
+            console.log("data: ", parsedData)
+            if (parsedData.data.exp < Date.now()) {
+                setData(data)
+            } else {
+                wipeData()
+            }
+        }
+    }, [])
 
     return (
         <>
