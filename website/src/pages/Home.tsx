@@ -181,47 +181,6 @@ const Home = () => {
                         </Flex>
                     </Flex>
                 </Flex>
-                {/* <Flex w="100%" justify="space-around">
-                    <Stack align="center" justify="center">
-                        {" "}
-                        <Image src={OfferImg} />
-                    </Stack>
-                    <Flex direction="column" w="100%">
-                        <Text fz={24} mb={24}>
-                            <Text span color="accent.9">
-                                Orbit
-                            </Text>{" "}
-                            offers you this:
-                        </Text>
-                        <Flex justify="space-evenly">
-                            {" "}
-                            <Box w="30%">
-                                <Text fz="xl">{creatorOffer.title}</Text>
-                                {creatorOffer.points.map(point => (
-                                    <>
-                                        <Text fz="lg" mt="8px">
-                                            {`${point.status ? "✅" : "❌"} ${
-                                                point.text
-                                            }`}
-                                        </Text>
-                                    </>
-                                ))}
-                            </Box>
-                            <Box w="30%">
-                                <Text fz="xl">{playerOffer.title}</Text>
-                                {playerOffer.points.map(point => (
-                                    <>
-                                        <Text fz="lg" mt="8px">
-                                            {`${point.status ? "✅" : "❌"} ${
-                                                point.text
-                                            }`}
-                                        </Text>
-                                    </>
-                                ))}
-                            </Box>
-                        </Flex>
-                    </Flex>
-                </Flex> */}
             </Box>
         </>
     )

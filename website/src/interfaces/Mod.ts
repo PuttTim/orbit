@@ -1,6 +1,6 @@
 type EnvTags = "Server" | "Client"
 
-type CategoryTags =
+type CategoryNames =
     | "Adventure"
     | "Building"
     | "Decoration"
@@ -17,11 +17,13 @@ interface Mod {
     summary: string
     creator: string
     created_on: string
+    thumbnail_url: string
     last_updated: number
     game_version: string
     downloads: number
     env_tags: EnvTags[]
-    category_tags: CategoryTags[]
+    category_tags: CategoryNames[]
 }
 
 export default Mod
+export type { EnvTags, CategoryNames }

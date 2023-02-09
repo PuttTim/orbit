@@ -4,7 +4,7 @@ import theme from "../Theme"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { useAppStore } from "../app/store"
-import { Plus, User } from "react-feather"
+import { Compass, Plus, User } from "react-feather"
 
 interface NavbarItems {
     pageTitle: string

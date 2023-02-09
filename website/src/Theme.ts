@@ -2,6 +2,9 @@ import { MantineThemeOverride } from "@mantine/core"
 
 const theme: MantineThemeOverride = {
     fontFamily: "Orbitron, sans-serif",
+    headings: {
+        fontFamily: "Orbitron, sans-serif",
+    },
     colorScheme: "dark",
     colors: {
         primary: [
