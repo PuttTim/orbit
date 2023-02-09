@@ -1,7 +1,14 @@
-import React from "react"
+import React, { useEffect } from "react"
+import fetcher from "../utils/fetcher"
+import useSWR from "swr"
 
 const Mods = () => {
-    console.log(import.meta.env.VITE_ORBIT_SECRET)
+    const { data, error } = useSWR("/mods/all", fetcher)
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
+
     return <div>{import.meta.env.ORBIT_SECRET}</div>
 }
 
