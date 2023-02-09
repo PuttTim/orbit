@@ -19,6 +19,7 @@ import {
 } from "react-feather"
 import numeral from "numeral"
 import dayjs from "dayjs"
+import { useNavigate } from "react-router-dom"
 
 interface TagIcon {
     name: CategoryNames | EnvTags
@@ -72,15 +73,20 @@ const EnvTags: TagIcon[] = [
 ]
 
 export const ModCard = (mod: Mod) => {
+    const navigate = useNavigate()
+
     return (
         <Flex
+            onClick={() => {
+                navigate(`/mod/${mod.name}`)
+            }}
             w="100%"
             h="100%"
             px="16px"
             py="16px"
             bg="primary.9"
             gap="16px"
-            sx={{ borderRadius: "8px" }}>
+            sx={{ borderRadius: "8px", cursor: "pointer" }}>
             <Image
                 maw="128px"
                 radius={8}
@@ -92,7 +98,7 @@ export const ModCard = (mod: Mod) => {
                 <Grid.Col span={8}>
                     {" "}
                     <Flex
-                        w="600px"
+                        w="500px"
                         h="100%"
                         direction="column"
                         justify="space-between">
@@ -104,7 +110,11 @@ export const ModCard = (mod: Mod) => {
                         <Flex w="100%" direction="row" gap="8px">
                             {mod.category_tags.map((tag, index) => {
                                 return (
-                                    <>
+                                    <Flex
+                                        gap="4px"
+                                        justify="center"
+                                        align="center"
+                                        key={index}>
                                         {
                                             CategoryTags.find(
                                                 category =>
@@ -112,7 +122,7 @@ export const ModCard = (mod: Mod) => {
                                             )?.icon
                                         }
                                         <Text>{tag}</Text>
-                                    </>
+                                    </Flex>
                                 )
                             })}
                         </Flex>
@@ -151,14 +161,18 @@ export const ModCard = (mod: Mod) => {
                         <Flex direction="row" gap="8px">
                             {mod.env_tags.map((tag, index) => {
                                 return (
-                                    <>
+                                    <Flex
+                                        gap="4px"
+                                        justify="center"
+                                        align="center"
+                                        key={index}>
                                         {
                                             EnvTags.find(
                                                 env => env.name === tag,
                                             )?.icon
                                         }
                                         <Text>{tag}</Text>
-                                    </>
+                                    </Flex>
                                 )
                             })}
                         </Flex>
