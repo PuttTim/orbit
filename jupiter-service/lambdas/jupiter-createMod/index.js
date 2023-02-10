@@ -3,6 +3,7 @@ import { DynamoDBDocumentClient, ExecuteStatementCommand, PutCommand } from "@aw
 import { nanoid } from "nanoid"
 
 const REGION = "us-east-1"
+const headers = { "Content-Type": "application/json" }
 
 const ddbClient = new DynamoDBClient({ region: REGION })
 
@@ -12,11 +13,13 @@ const unmarshallOptions = { wrapNumbers: false }
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient, { marshallOptions, unmarshallOptions })
 
 export const handler = async (event) => {
-	const modId = nanoid(12)
+	// TODO implement
+
+	const modId = event.pathParameters.mod_id
 
 	const res = await insertMod(modId, JSON.parse(event.body))
 
-	return res
+	return { ...res, headers }
 }
 
 const insertMod = async (modId, modData) => {

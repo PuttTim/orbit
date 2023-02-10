@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import { DynamoDBDocumentClient, ExecuteStatementCommand } from "@aws-sdk/lib-dynamodb"
 
 const REGION = "us-east-1"
+const headers = { "Content-Type": "application/json" }
 
 const ddbClient = new DynamoDBClient({ region: REGION })
 
@@ -11,11 +12,9 @@ const unmarshallOptions = { wrapNumbers: false }
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient, { marshallOptions, unmarshallOptions })
 
 export const handler = async (event) => {
-	// TODO Limit to 20 most downloaded mods & optimise fetchLatestDownload()
-	const response = {
-		statusCode: 200,
-		body: JSON.stringify("Hello from Lambda!"),
-	}
+	// TODO implement
+
+	let res
 
 	const mods = await fetchAllMods()
 
@@ -36,19 +35,22 @@ export const handler = async (event) => {
 	await Promise.all(allMods).then((data) => {
 		allMods = data
 		// console.log("All mods: ", allMods)
-		response.body = JSON.stringify(allMods)
+		res = {
+			statusCode: 200,
+			body: JSON.stringify(allMods),
+		}
 	})
 
-	return response
+	return { ...res, headers }
 }
 
 const compileModData = async (mod) => {
 	console.log("⚒️ Constructing: ", mod.mod_id, mod.name)
 	const totalDownloads = await fetchDownloadCount(mod.mod_id)
-	// console.log("Total downloads: ", totalDownloads, "for: ", mod.name)
+	console.log("Total downloads: ", totalDownloads, "for: ", mod.name)
 
 	const latestVersion = await fetchLatestVersion(mod.mod_id)
-	// console.log("Latest Version of: ", mod.name, ":", latestVersion)
+	console.log("Latest Version of: ", mod.name, ":", latestVersion)
 
 	const data = {
 		mod_id: mod.mod_id,
@@ -56,6 +58,7 @@ const compileModData = async (mod) => {
 		summary: mod.summary,
 		creator: mod.creator,
 		created_on: mod.created_on,
+		thumbnail_url: mod.thumbnail_url,
 		last_updated: latestVersion.timestamp,
 		game_version: latestVersion.game_version,
 		downloads: totalDownloads,
@@ -125,4 +128,4 @@ const fetchLatestVersion = async (modId) => {
 	return data.Items[0]
 }
 
-console.log(await handler({}))
+// console.log(await handler({}))
