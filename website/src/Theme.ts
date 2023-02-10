@@ -43,6 +43,17 @@ const theme: MantineThemeOverride = {
             "rgba(180, 140, 255, 0.9)",
             "rgba(180, 140, 255, 1)",
         ],
+        red: [
+            "rgba(175, 84, 86, 0.1)",
+            "rgba(175, 84, 86, 0.2)",
+            "rgba(175, 84, 86, 0.3)",
+            "rgba(175, 84, 86, 0.4)",
+            "rgba(175, 84, 86, 0.5)",
+            "rgba(175, 84, 86, 0.6)",
+            "rgba(175, 84, 86, 0.7)",
+            "rgba(175, 84, 86, 0.8)",
+            "rgba(175, 84, 86, 0.9)",
+        ],
         highlight: [
             "#AF5456",
             "#7CEDF4",
@@ -50,6 +61,7 @@ const theme: MantineThemeOverride = {
             "#E76ADA",
             "#AF7A3E",
             "#52A435",
+            "rgb(124, 237, 244, 0.5)",
         ],
         dark: [
             "#FFF",
