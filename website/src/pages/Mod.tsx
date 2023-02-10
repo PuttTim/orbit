@@ -45,6 +45,7 @@ import numeral from "numeral"
 import { ReactMarkdown } from "react-markdown/lib/react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeRaw from "rehype-raw"
+import { useAppStore } from "../app/store"
 
 interface TabItems {
     tabName: string
@@ -153,6 +154,7 @@ const Mod = () => {
     const [currentTab, setCurrentTab] = useState<TabItems>(tabs[0])
     const [modData, setModData] = useState<ModPage>()
     const [modVersions, setModVersions] = useState<Version[]>()
+    const userData = useAppStore(state => state.data)
 
     useEffect(() => {
         console.log(typeof modFetchData)
@@ -173,13 +175,13 @@ const Mod = () => {
         }
     }, [versionFetchData])
 
-    useEffect(() => {
-        console.log("useffect", modData)
-    }, [modData])
+    // useEffect(() => {
+    //     console.log("useffect", modData)
+    // }, [modData])
 
-    useEffect(() => {
-        console.log("fetch version", versionFetchData)
-    }, [versionFetchData])
+    // useEffect(() => {
+    //     console.log("fetch version", versionFetchData)
+    // }, [versionFetchData])
 
     return (
         <>
@@ -569,7 +571,8 @@ const Mod = () => {
                                 )}
                             </Flex>
                             {/* TODO: REPLACE WITH USER'S AUTH CHECKING */}
-                            {true ? (
+                            {userData !== undefined &&
+                            userData["cognito:username"] === modData.creator ? (
                                 <>
                                     <Button
                                         leftIcon={<Trash2 />}
