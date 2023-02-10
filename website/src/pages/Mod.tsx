@@ -1,11 +1,8 @@
 import {
     Box,
     Button,
-    Container,
     Divider,
     Flex,
-    Grid,
-    Space,
     Text,
     Title,
     Image,
@@ -23,12 +20,9 @@ import {
     EnvTags,
 } from "../interfaces/Mod"
 import {
-    Edit2,
-    Edit3,
     GitHub,
     Info,
     MessageSquare,
-    Trash,
     Trash2,
     Box as BoxIcon,
     Compass,

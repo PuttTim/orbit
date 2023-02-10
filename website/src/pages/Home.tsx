@@ -15,6 +15,10 @@ import Hero from "../assets/orbit_hero.svg"
 import OfferImg from "../assets/orbit_offer.svg"
 import { ArrowRight } from "react-feather"
 import { useNavigate } from "react-router-dom"
+import { Mod } from "../interfaces/Mod"
+import useSWR from "swr"
+import fetcher from "../utils/fetcher"
+import { useEffect, useState } from "react"
 
 interface Offer {
     title: string
@@ -62,6 +66,14 @@ const playerOffer: Offer = {
 
 const Home = () => {
     const navigate = useNavigate()
+    const { data, error, isLoading } = useSWR<Mod[], Error>("mods/all", fetcher)
+    const [allMods, setAllMods] = useState<Mod[]>()
+
+    useEffect(() => {
+        if (data) {
+            setAllMods(data)
+        }
+    }, [data])
 
     return (
         <>
@@ -76,7 +88,19 @@ const Home = () => {
                 <Flex justify="space-between">
                     <Flex direction="column" justify="space-around" w="40%">
                         <Text lh="normal" fz={32}>
-                            Gravitate to 00 mods that{" "}
+                            Gravitate to{" "}
+                            {isLoading ? (
+                                <Text span>...</Text>
+                            ) : (
+                                <Text span>
+                                    more than
+                                    <Text span color="accent.9">
+                                        {" "}
+                                        {allMods?.length}
+                                    </Text>
+                                </Text>
+                            )}{" "}
+                            mods that{" "}
                             <Text span color="accent.9">
                                 Orbit
                             </Text>{" "}
