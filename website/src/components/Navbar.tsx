@@ -46,7 +46,7 @@ const Navbar = () => {
 
     return (
         <Box
-            h="50px"
+            h="5vh"
             w="100%"
             bg="primary.9"
             px="15px"

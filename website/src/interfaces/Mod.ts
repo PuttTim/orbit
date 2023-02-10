@@ -10,6 +10,13 @@ type CategoryNames =
     | "Utility"
     | "World Generation"
 
+type LinkNames = "discord" | "wiki" | "github"
+
+type ExternalLinks = {
+    type: LinkNames
+    link: string
+}
+
 interface Mod {
     // create a Mod Interface from exampleMod
     mod_id: string
@@ -34,13 +41,14 @@ interface ModPage {
     mod_id: string
     category_tags: CategoryNames[]
     env_tags: EnvTags[]
-    external_links: string[]
     name: string
-    contributors: string
     created_on: string
     downloads: number
+    last_updated: string
+    contributors?: string[]
+    external_links?: ExternalLinks[]
     message?: string
 }
 
 export type { Mod, ModPage }
-export type { EnvTags, CategoryNames }
+export type { EnvTags, CategoryNames, LinkNames, ExternalLinks }
