@@ -27,9 +27,14 @@ export const handler = async (event) => {
 		try {
 			const data = await ddbDocClient.send(new ExecuteStatementCommand(params))
 			const mod = data.Items[0]
+			const latestVersion = await fetchLatestVersion(mod.mod_id)
 			res = {
 				statusCode: 200,
-				body: JSON.stringify({ ...mod, downloads: await fetchDownloadCount(mod.mod_id) }),
+				body: JSON.stringify({
+					...mod,
+					last_updated: latestVersion.timestamp,
+					downloads: await fetchDownloadCount(mod.mod_id),
+				}),
 			}
 		} catch (err) {
 			console.log(err)
@@ -92,6 +97,26 @@ const fetchDownloadCount = async (modId) => {
 	})
 
 	return totalDownloads
+}
+
+const fetchLatestVersion = async (modId) => {
+	const params = {
+		Statement: `SELECT * FROM version_releases WHERE mod_id = ?`,
+		Parameters: [modId],
+	}
+
+	// console.log(params)
+
+	let data
+
+	try {
+		data = await ddbDocClient.send(new ExecuteStatementCommand(params))
+		data.Items.sort((a, b) => b.timestamp - a.timestamp)
+	} catch (error) {
+		console.log(error)
+	}
+
+	return data.Items[0]
 }
 
 // await handler({ pathParameters: { mod_name: "Decocraft" } }).then((res) => console.log(res))
