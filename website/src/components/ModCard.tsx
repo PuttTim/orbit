@@ -1,5 +1,5 @@
 import React from "react"
-import Mod, { CategoryNames, EnvTags } from "../interfaces/Mod"
+import { CategoryNames, EnvTags, Mod } from "../interfaces/Mod"
 import { AspectRatio, Box, Flex, Grid, Image, Text, Title } from "@mantine/core"
 import {
     Icon,
@@ -102,29 +102,36 @@ export const ModCard = (mod: Mod) => {
                         h="100%"
                         direction="column"
                         justify="space-between">
-                        <Title order={2}>{mod.name}</Title>
+                        <Flex gap="8px" align="end">
+                            <Title order={2}>{mod.name}</Title>
+                            <Title order={3} fw={500}>
+                                by {mod.creator}
+                            </Title>
+                        </Flex>
                         <Text mah="3em" lh="1.5em" fz="xl" lineClamp={2}>
                             {mod.summary}
                         </Text>
 
                         <Flex w="100%" direction="row" gap="8px">
-                            {mod.category_tags.map((tag, index) => {
-                                return (
-                                    <Flex
-                                        gap="4px"
-                                        justify="center"
-                                        align="center"
-                                        key={index}>
-                                        {
-                                            CategoryTags.find(
-                                                category =>
-                                                    category.name === tag,
-                                            )?.icon
-                                        }
-                                        <Text>{tag}</Text>
-                                    </Flex>
-                                )
-                            })}
+                            {mod.category_tags.map(
+                                (tag: CategoryNames, index: number) => {
+                                    return (
+                                        <Flex
+                                            gap="4px"
+                                            justify="center"
+                                            align="center"
+                                            key={index}>
+                                            {
+                                                CategoryTags.find(
+                                                    category =>
+                                                        category.name === tag,
+                                                )?.icon
+                                            }
+                                            <Text>{tag}</Text>
+                                        </Flex>
+                                    )
+                                },
+                            )}
                         </Flex>
                     </Flex>
                 </Grid.Col>
@@ -159,7 +166,7 @@ export const ModCard = (mod: Mod) => {
                             </Text>
                         </Flex>
                         <Flex direction="row" gap="8px">
-                            {mod.env_tags.map((tag, index) => {
+                            {mod.env_tags.map((tag: EnvTags, index: number) => {
                                 return (
                                     <Flex
                                         gap="4px"

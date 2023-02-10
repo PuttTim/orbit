@@ -25,5 +25,22 @@ interface Mod {
     category_tags: CategoryNames[]
 }
 
-export default Mod
+interface ModPage {
+    // create a ModPage Interface from exampleModPage
+    detail: string
+    summary: string
+    creator: string
+    thumbnail_url: string
+    mod_id: string
+    category_tags: CategoryNames[]
+    env_tags: EnvTags[]
+    external_links: string[]
+    name: string
+    contributors: string
+    created_on: string
+    downloads: number
+    message?: string
+}
+
+export type { Mod, ModPage }
 export type { EnvTags, CategoryNames }

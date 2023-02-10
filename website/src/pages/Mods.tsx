@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useState, Dispatch } from "react"
 import fetcher from "../utils/fetcher"
 import useSWR from "swr"
-import Mod, { CategoryNames, EnvTags } from "../interfaces/Mod"
+import { CategoryNames, EnvTags, Mod } from "../interfaces/Mod"
 import { ModCard } from "../components/ModCard"
 import {
     Box,
@@ -48,10 +48,7 @@ const selectStyles = (theme: any) => ({
 })
 
 const Mods = () => {
-    const { data, error, isLoading } = useSWR<Mod[], Error>(
-        "/mods/all",
-        fetcher,
-    )
+    const { data, error, isLoading } = useSWR<Mod[], Error>("mods/all", fetcher)
 
     const [allMods, setAllMods] = useDebouncedState<Mod[] | undefined>(
         undefined,
@@ -141,7 +138,7 @@ const Mods = () => {
 
     useEffect(() => {
         if (data) {
-            console.log(data[0])
+            // console.log(data[0])
             setAllMods(data)
             setSort("downloads")
         }
