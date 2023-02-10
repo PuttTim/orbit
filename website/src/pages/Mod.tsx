@@ -48,6 +48,9 @@ import { Version } from "../interfaces/Version"
 import dayjs from "dayjs"
 import VersionCard from "../components/VersionCard"
 import numeral from "numeral"
+import { ReactMarkdown } from "react-markdown/lib/react-markdown"
+import remarkGfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
 
 interface TabItems {
     tabName: string
@@ -467,8 +470,37 @@ const Mod = () => {
                             w="70rem"
                             h="100%"
                             bg="primary.9"
+                            py="16px"
+                            px="16px"
                             sx={{ borderRadius: "8px" }}>
-                            a
+                            <ReactMarkdown
+                                components={{
+                                    h1: ({ node, ...props }) => (
+                                        <Title order={1} {...props} />
+                                    ),
+                                    h2: ({ node, ...props }) => (
+                                        <Title order={2} {...props} />
+                                    ),
+                                    h3: ({ node, ...props }) => (
+                                        <Title order={3} {...props} />
+                                    ),
+                                    h4: ({ node, ...props }) => (
+                                        <Title order={4} {...props} />
+                                    ),
+                                    h5: ({ node, ...props }) => (
+                                        <Title order={5} {...props} />
+                                    ),
+                                    h6: ({ node, ...props }) => (
+                                        <Title order={6} {...props} />
+                                    ),
+                                    p: ({ node, ...props }) => (
+                                        <Title order={5} fw={500} {...props} />
+                                    ),
+                                }}
+                                children={`${modData.detail}`}
+                                remarkPlugins={[remarkGfm]}
+                                rehypePlugins={[rehypeRaw]}
+                            />
                         </Box>
                         <Flex w="30rem" h="100%" direction="column" gap="20px">
                             <Flex
