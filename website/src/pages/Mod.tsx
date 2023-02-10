@@ -308,7 +308,7 @@ const Mod = () => {
                                 gap="8px"
                                 justify="center"
                                 align="center">
-                                <Flex gap="8px">
+                                <Flex gap="8px" align="center" justify="center">
                                     <Calendar size="48px" />
                                     <Flex direction="column" align="center">
                                         <Title order={4}>Created On</Title>
@@ -326,7 +326,7 @@ const Mod = () => {
                                     color="dark.0"
                                     sx={{ borderRadius: "16px" }}
                                 />
-                                <Flex gap="8px">
+                                <Flex gap="8px" align="center" justify="center">
                                     <Flex direction="column" align="center">
                                         <Title order={4}>Last Updated</Title>
                                         <Title order={3}>
