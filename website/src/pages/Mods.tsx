@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useState, Dispatch } from "react"
 import fetcher from "../utils/fetcher"
 import useSWR from "swr"
-import Mod from "../interfaces/Mod"
+import Mod, { CategoryNames, EnvTags } from "../interfaces/Mod"
 import { ModCard } from "../components/ModCard"
 import {
     Box,
@@ -14,9 +14,38 @@ import {
     TextInput,
     Title,
     Select,
+    MultiSelect,
 } from "@mantine/core"
 import { Search } from "react-feather"
 import { useDebouncedState } from "@mantine/hooks"
+
+const selectStyles = (theme: any) => ({
+    input: {
+        color: theme.colors.dark[0],
+        backgroundColor: theme.colors.secondary[9],
+    },
+    dropdown: {
+        backgroundColor: theme.colors.secondary[9],
+        color: theme.colors.dark[0],
+    },
+    item: {
+        // applies styles to selected item
+        "&[data-selected]": {
+            "&, &:hover": {
+                backgroundColor: theme.colors.accent[2],
+                color: theme.white,
+            },
+        },
+
+        // applies styles to hovered item (with mouse or keyboard)
+        "&[data-hovered]": {
+            "&, &:hover": {
+                backgroundColor: theme.colors.accent[5],
+                color: theme.white,
+            },
+        },
+    },
+})
 
 const Mods = () => {
     const { data, error, isLoading } = useSWR<Mod[], Error>(
@@ -31,14 +60,32 @@ const Mods = () => {
 
     const [search, setSearch] = useState<string>("")
     const [sort, setSort] = useState<string | null>("")
+    const [categoryFilter, setCategoryFilter] = useState<any>()
+    const [envFilter, setEnvFilter] = useState<any>()
 
     useEffect(() => {
         let resultData
 
+        resultData = searchMods(search, resultData)
+
+        resultData = sortMods(sort, resultData)
+
+        resultData = filterCategoryTags(categoryFilter, resultData)
+
+        resultData = filterEnvTags(envFilter, resultData)
+
+        setAllMods(resultData)
+    }, [search, sort, categoryFilter, envFilter])
+
+    const searchMods = (search: string, resultData: Mod[] | undefined) => {
         resultData = data?.filter(mod => {
             return mod.name.toLowerCase().includes(search.toLowerCase())
         })
 
+        return resultData
+    }
+
+    const sortMods = (sort: string | null, resultData: Mod[] | undefined) => {
         switch (sort) {
             case "downloads":
                 resultData = resultData?.sort((a, b) => {
@@ -66,8 +113,31 @@ const Mods = () => {
                 break
         }
 
-        setAllMods(resultData)
-    }, [search, sort])
+        return resultData
+    }
+
+    const filterCategoryTags = (
+        tags: CategoryNames[],
+        resultData: Mod[] | undefined,
+    ) => {
+        if (categoryFilter) {
+            resultData = resultData?.filter(mod =>
+                tags.every(f => mod.category_tags.includes(f)),
+            )
+        }
+
+        return resultData
+    }
+
+    const filterEnvTags = (tags: EnvTags[], resultData: Mod[] | undefined) => {
+        if (envFilter) {
+            resultData = resultData?.filter(mod =>
+                tags.every(f => mod.env_tags.includes(f)),
+            )
+        }
+
+        return resultData
+    }
 
     useEffect(() => {
         if (data) {
@@ -83,15 +153,45 @@ const Mods = () => {
     return (
         <Flex gap="16px" mt="16px">
             <Flex
+                direction="column"
                 w="250px"
                 h="100%"
                 py="20px"
                 px="20px"
                 bg="primary.9"
+                gap="8px"
                 sx={{ borderRadius: "8px" }}>
                 <Title order={2} td="underline">
                     Filter
                 </Title>
+                <Title mt="8px" order={5}>
+                    Category Tags:
+                </Title>
+                <MultiSelect
+                    onChange={setCategoryFilter}
+                    placeholder="Select Category"
+                    data={[
+                        "Adventure",
+                        "Building",
+                        "Decoration",
+                        "Magic",
+                        "Optimisation",
+                        "Technology",
+                        "Utility",
+                        "World Generation",
+                    ]}
+                    styles={selectStyles}
+                />
+                <Title mt="8px" order={5}>
+                    Environment Tags:
+                </Title>
+
+                <MultiSelect
+                    onChange={setEnvFilter}
+                    placeholder="Select Environment"
+                    data={["Server", "Client"]}
+                    styles={selectStyles}
+                />
             </Flex>
             <Flex w="100%" gap="16px" direction="column">
                 <Flex
@@ -144,33 +244,7 @@ const Mods = () => {
                             { label: "Recently Updated", value: "updated" },
                             { label: "Recently Created", value: "created" },
                         ]}
-                        styles={theme => ({
-                            input: {
-                                color: theme.colors.dark[0],
-                                backgroundColor: theme.colors.secondary[9],
-                            },
-                            dropdown: {
-                                backgroundColor: theme.colors.secondary[9],
-                                color: theme.colors.dark[0],
-                            },
-                            item: {
-                                // applies styles to selected item
-                                "&[data-selected]": {
-                                    "&, &:hover": {
-                                        backgroundColor: theme.colors.accent[2],
-                                        color: theme.white,
-                                    },
-                                },
-
-                                // applies styles to hovered item (with mouse or keyboard)
-                                "&[data-hovered]": {
-                                    "&, &:hover": {
-                                        backgroundColor: theme.colors.accent[5],
-                                        color: theme.white,
-                                    },
-                                },
-                            },
-                        })}
+                        styles={selectStyles}
                     />
                 </Flex>
                 {isLoading ? (
