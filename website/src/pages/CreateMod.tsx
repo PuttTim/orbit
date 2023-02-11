@@ -15,19 +15,72 @@ import {
     TextInput,
     Select,
     Radio,
+    MultiSelect,
 } from "@mantine/core"
 import { useEffect, useState } from "react"
-import { Check, Trash, Upload, X } from "react-feather"
+import {
+    Check,
+    GitHub,
+    Info,
+    MessageSquare,
+    Trash,
+    Upload,
+    X,
+} from "react-feather"
 import useSWR from "swr"
 import fetcher from "../utils/fetcher"
 import { useAppStore } from "../app/store"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "@mantine/form"
+import {
+    CategoryNames,
+    EnvTags,
+    ExternalLinks,
+    LinkNames,
+} from "../interfaces/Mod"
 
 interface DialogText {
     content: string
     type: "error" | "success"
 }
+
+interface ModForm {
+    category_tags?: CategoryNames[]
+    creator: string
+    detail: string
+    env_tags?: EnvTags[]
+    external_links?: ExternalLinks[]
+    name: string
+    summary: string
+}
+
+const selectStyles = (theme: any) => ({
+    input: {
+        color: theme.colors.dark[0],
+        backgroundColor: theme.colors.primary[9],
+    },
+    dropdown: {
+        backgroundColor: theme.colors.primary[9],
+        color: theme.colors.dark[0],
+    },
+    item: {
+        // applies styles to selected item
+        "&[data-selected]": {
+            "&, &:hover": {
+                backgroundColor: theme.colors.accent[2],
+                color: theme.white,
+            },
+        },
+
+        // applies styles to hovered item (with mouse or keyboard)
+        "&[data-hovered]": {
+            "&, &:hover": {
+                backgroundColor: theme.colors.accent[5],
+                color: theme.white,
+            },
+        },
+    },
+})
 
 const CreateMod = () => {
     const navigate = useNavigate()
@@ -41,6 +94,7 @@ const CreateMod = () => {
     // Form related states
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
     const [versionFile, setVersionFile] = useState<File | null>(null)
+    const [externalLinks, setExternalLinks] = useState<ExternalLinks[]>([])
     const versionForm = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -62,6 +116,31 @@ const CreateMod = () => {
             stage: value => {
                 if (value === "") {
                     return "Stage is required"
+                }
+            },
+        },
+    })
+    const modForm = useForm({
+        validateInputOnChange: true,
+        validate: {
+            detail: (value: string) => {
+                if (value === "") {
+                    return "Detail is required"
+                }
+            },
+            name: value => {
+                if (value === "") {
+                    return "Name is required"
+                }
+            },
+            summary: value => {
+                if (value === "") {
+                    return "Summary is required"
+                }
+            },
+            external_links: value => {
+                if (false) {
+                    return "External links is required"
                 }
             },
         },
@@ -156,6 +235,82 @@ const CreateMod = () => {
         }
     }
 
+    const updateExternalLinks = (type: LinkNames, link: string) => {
+        if (externalLinks.find(el => el.type === type)) {
+            setExternalLinks(
+                externalLinks.map(el => {
+                    if (el.type === type) {
+                        return {
+                            ...el,
+                            link,
+                        }
+                    }
+                    return el
+                }),
+            )
+            return
+        } else {
+            setExternalLinks([
+                ...externalLinks,
+                {
+                    link,
+                    type,
+                },
+            ])
+        }
+    }
+
+    const externalLinkHandler = (type: LinkNames, link: string) => {
+        try {
+            const uri = new URL(link)
+            if (uri.protocol !== "http:" && uri.protocol !== "https:") {
+                throw new Error("Invalid protocol")
+            } else {
+                // console.log("Valid protocol")
+                // console.log(uri)
+
+                switch (type) {
+                    case "github":
+                        console.log(uri)
+
+                        if (uri.hostname !== "www.github.com") {
+                            throw new Error("Invalid hostname")
+                        }
+                        break
+                    case "discord":
+                        console.log(uri)
+                        if (
+                            uri.hostname !== "discord.com" &&
+                            uri.hostname !== "discord.gg"
+                        ) {
+                            throw new Error("Invalid hostname")
+                        }
+
+                        break
+                    case "wiki":
+                        break
+                }
+                console.log("Valid URL")
+                if (type !== "wiki") {
+                    setDialogText({
+                        content: "Valid URL",
+                        type: "success",
+                    })
+                    setOpened(true)
+                }
+
+                updateExternalLinks(type, link)
+            }
+        } catch {
+            console.log("Invalid URL")
+            setDialogText({
+                content: "Invalid URL",
+                type: "error",
+            })
+            setOpened(true)
+        }
+    }
+
     useEffect(() => {
         fetcher("/mod/generate_id").then(res => {
             setModId(res.mod_id)
@@ -174,6 +329,10 @@ const CreateMod = () => {
             }, 2000)
         }
     }, [opened])
+
+    useEffect(() => {
+        console.log("Mod form changed", externalLinks)
+    }, [externalLinks])
 
     return (
         <>
@@ -211,7 +370,7 @@ const CreateMod = () => {
                 </Title>
                 <Accordion
                     transitionDuration={200}
-                    defaultValue="version"
+                    defaultValue="mod"
                     radius={8}
                     variant="separated"
                     styles={theme => ({
@@ -422,17 +581,190 @@ const CreateMod = () => {
                                 justify="flex-start"
                                 align="center"
                                 gap="16px">
-                                {modFormStatus ? (
+                                {versionFormStatus ? (
                                     <Check color="green" />
                                 ) : (
                                     <X color="red" />
                                 )}
                                 <Title order={3} fw={500}>
-                                    Enter Mod Details
-                                </Title>{" "}
+                                    Create & upload a Version Release
+                                </Title>
                             </Flex>
                         </Accordion.Control>
-                        <Accordion.Panel>AA</Accordion.Panel>
+                        <Accordion.Panel>
+                            {" "}
+                            <Flex direction="column" gap="16px">
+                                <Flex w="100%" h="100%" gap="40px">
+                                    <Box w="50%" h="100%">
+                                        <TextInput
+                                            onChange={event => {
+                                                modForm.setFieldValue(
+                                                    "name",
+                                                    event.target.value,
+                                                )
+                                            }}
+                                            withAsterisk
+                                            placeholder="Quark"
+                                            label="Mod Name"
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                        <TextInput
+                                            onChange={event => {
+                                                modForm.setFieldValue(
+                                                    "summary",
+                                                    event.target.value,
+                                                )
+                                            }}
+                                            withAsterisk
+                                            placeholder="Useful mod for Minecraft"
+                                            label="Short Summary"
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                        <TextInput
+                                            onChange={event => {
+                                                console.log("do nothing")
+                                            }}
+                                            disabled
+                                            label="Project Owner"
+                                            variant="filled"
+                                            withAsterisk
+                                            value={
+                                                userData?.["cognito:username"]
+                                            }
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                        <TextInput
+                                            placeholder="Vazkii, RWTema, ..."
+                                            onChange={event => {
+                                                modForm.setFieldValue(
+                                                    "contributors",
+                                                    event.target.value
+                                                        .replace(/ /g, "")
+                                                        .split(","),
+                                                )
+                                            }}
+                                            label="Project Contributors"
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                    </Box>
+                                    <Box w="50%" h="100%">
+                                        {" "}
+                                        <MultiSelect
+                                            label="Category Tags"
+                                            variant="filled"
+                                            onChange={event => {
+                                                modForm.setFieldValue(
+                                                    "category_tags",
+                                                    event,
+                                                )
+                                            }}
+                                            placeholder="Select Category"
+                                            data={[
+                                                "Adventure",
+                                                "Building",
+                                                "Decoration",
+                                                "Magic",
+                                                "Optimisation",
+                                                "Technology",
+                                                "Utility",
+                                                "World Generation",
+                                            ]}
+                                            styles={selectStyles}
+                                        />
+                                        <MultiSelect
+                                            label="Mod Environment Tags"
+                                            variant="filled"
+                                            onChange={event => {
+                                                modForm.setFieldValue(
+                                                    "env_tags",
+                                                    event,
+                                                )
+                                            }}
+                                            placeholder="Server..."
+                                            data={["Server", "Client"]}
+                                            styles={selectStyles}
+                                        />
+                                        <TextInput
+                                            label="GitHub Link"
+                                            placeholder="https://github.com/VazkiiMods/Quark"
+                                            icon={<GitHub />}
+                                            onChange={event => {
+                                                externalLinkHandler(
+                                                    "github",
+                                                    event.target.value,
+                                                )
+                                            }}
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                        <TextInput
+                                            label="Mod Wiki"
+                                            placeholder="https://quarkmod.net/#features"
+                                            icon={<Info />}
+                                            onChange={event => {
+                                                externalLinkHandler(
+                                                    "wiki",
+                                                    event.target.value,
+                                                )
+                                            }}
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                        <TextInput
+                                            label="Discord Server"
+                                            placeholder="https://discord.gg/quark"
+                                            icon={<MessageSquare />}
+                                            onChange={event => {
+                                                externalLinkHandler(
+                                                    "discord",
+                                                    event.target.value,
+                                                )
+                                            }}
+                                            variant="filled"
+                                            styles={theme => ({
+                                                input: {
+                                                    backgroundColor:
+                                                        theme.colors.primary[9],
+                                                },
+                                            })}
+                                        />
+                                    </Box>
+                                </Flex>
+                            </Flex>
+                        </Accordion.Panel>
                     </Accordion.Item>
                 </Accordion>
                 <Button
