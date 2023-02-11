@@ -98,7 +98,10 @@ const Mods = () => {
                 break
             case "updated":
                 resultData = resultData?.sort((a, b) => {
-                    return a.last_updated - b.last_updated
+                    return (
+                        parseInt(a.last_updated as string) -
+                        parseInt(b.last_updated as string)
+                    )
                 })
                 console.log("sort by updated")
                 break
