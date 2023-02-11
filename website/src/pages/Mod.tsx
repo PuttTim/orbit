@@ -7,6 +7,7 @@ import {
     Title,
     Image,
     Loader,
+    Modal,
 } from "@mantine/core"
 import fetcher from "../utils/fetcher"
 import useSWR from "swr"
@@ -37,6 +38,7 @@ import {
     Calendar,
     Monitor,
     Server,
+    Trash,
 } from "react-feather"
 import { Version } from "../interfaces/Version"
 import dayjs from "dayjs"
@@ -155,6 +157,25 @@ const Mod = () => {
     const [modData, setModData] = useState<ModPage>()
     const [modVersions, setModVersions] = useState<Version[]>()
     const userData = useAppStore(state => state.data)
+    const [opened, setOpened] = useState(false)
+
+    const deleteMod = () => {
+        fetch(
+            `${import.meta.env.VITE_ORBIT_API_URI}/mod/delete/${
+                modData?.mod_id
+            }`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        ).then(res => {
+            if (res.status === 200) {
+                navigate("/")
+            }
+        })
+    }
 
     useEffect(() => {
         console.log(typeof modFetchData)
@@ -185,6 +206,25 @@ const Mod = () => {
 
     return (
         <>
+            <Modal
+                centered
+                opened={opened}
+                onClose={() => {
+                    setOpened(false)
+                }}
+                title="Are you sure you want to delete?">
+                <Flex direction="column" gap="20px">
+                    <Text>This action is irreversible.</Text>
+                    <Button
+                        onClick={() => {
+                            deleteMod()
+                        }}
+                        color="red"
+                        leftIcon={<Trash2 />}>
+                        DELETE
+                    </Button>
+                </Flex>
+            </Modal>
             {modFetchIsLoading || modData === undefined ? (
                 <Flex
                     direction="column"
@@ -572,6 +612,9 @@ const Mod = () => {
                             userData["cognito:username"] === modData.creator ? (
                                 <>
                                     <Button
+                                        onClick={() => {
+                                            setOpened(true)
+                                        }}
                                         leftIcon={<Trash2 />}
                                         styles={theme => ({
                                             root: {
