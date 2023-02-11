@@ -6,18 +6,24 @@ import {
     Box,
     ActionIcon,
     Button,
+    MantineTheme,
+    FileInput,
+    Text,
+    Image,
+    AspectRatio,
 } from "@mantine/core"
 import { useEffect, useState } from "react"
-import { Check, X } from "react-feather"
+import { Check, Trash, Upload, X } from "react-feather"
 import useSWR from "swr"
 import fetcher from "../utils/fetcher"
 
 const CreateMod = () => {
     const [versionFormStatus, setVersionFormStatus] = useState<boolean>(true)
     const [thumbnailUploadStatus, setThumbnailUploadStatus] =
-        useState<boolean>(false)
+        useState<boolean>(true)
     const [modFormStatus, setModFormStatus] = useState<boolean>(false)
     const [modId, setModId] = useState<string>("")
+    const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
 
     useEffect(() => {
         fetcher("/mod/generate_id").then(res => {
@@ -38,7 +44,29 @@ const CreateMod = () => {
                 <Title order={1} td="underline">
                     Create a new Mod Project
                 </Title>
-                <Accordion transitionDuration={200} defaultValue="version">
+                <Accordion
+                    transitionDuration={200}
+                    defaultValue="version"
+                    radius={8}
+                    variant="separated"
+                    styles={theme => ({
+                        control: {
+                            "&:hover": {
+                                borderRadius: "8px",
+                                backgroundColor: theme.colors.secondary[3],
+                            },
+                        },
+                        item: {
+                            backgroundColor: theme.colors.primary[9],
+                            "&[data-active]": {
+                                backgroundColor: theme.colors.secondary[3],
+                                border: "none",
+                            },
+                            "&:hover": {
+                                borderRadius: "8px",
+                            },
+                        },
+                    })}>
                     <Accordion.Item value="version">
                         <Accordion.Control>
                             <Flex
@@ -51,7 +79,7 @@ const CreateMod = () => {
                                     <X color="red" />
                                 )}
                                 <Title order={3} fw={500}>
-                                    Create & Upload a Version Release
+                                    Create & upload a Version Release
                                 </Title>
                             </Flex>
                         </Accordion.Control>
@@ -73,7 +101,67 @@ const CreateMod = () => {
                                 </Title>
                             </Flex>
                         </Accordion.Control>
-                        <Accordion.Panel>AA</Accordion.Panel>
+                        <Accordion.Panel>
+                            <Flex direction="column" gap="16px">
+                                <Text fz="lg">
+                                    Thumbnail File{" "}
+                                    <Text span color="red.8">
+                                        *
+                                    </Text>
+                                </Text>
+                                <FileInput
+                                    onChange={(files: File | null) => {
+                                        console.log(files)
+                                        setThumbnailFile(files)
+                                    }}
+                                    value={thumbnailFile}
+                                    icon={<Upload />}
+                                    accept="
+                                        image/png,image/jpeg"
+                                    variant="filled"
+                                    placeholder="Select a Thumbnail to upload..."
+                                    styles={theme => ({
+                                        input: {
+                                            backgroundColor:
+                                                theme.colors.primary[9],
+                                        },
+                                    })}
+                                />
+                                <Text fz="lg">Preview</Text>
+                                <Flex align="center" gap="20px">
+                                    <AspectRatio
+                                        ratio={160 / 160}
+                                        w="240px"
+                                        h="240px">
+                                        <Image
+                                            src={
+                                                thumbnailFile !== null
+                                                    ? URL.createObjectURL(
+                                                          thumbnailFile,
+                                                      )
+                                                    : ""
+                                            }
+                                            withPlaceholder
+                                        />
+                                    </AspectRatio>
+                                    <Button
+                                        onClick={() => {
+                                            setThumbnailFile(null)
+                                        }}
+                                        color="red.8"
+                                        leftIcon={<Trash />}>
+                                        Remove
+                                    </Button>
+                                </Flex>
+
+                                <Button
+                                    disabled={thumbnailFile === null}
+                                    color="accent.2"
+                                    size="lg">
+                                    UPLOAD
+                                </Button>
+                            </Flex>
+                        </Accordion.Panel>
                     </Accordion.Item>
                     <Accordion.Item value="mod">
                         <Accordion.Control>
@@ -98,9 +186,11 @@ const CreateMod = () => {
                     size="lg"
                     color="accent.4"
                     disabled={
-                        versionFormStatus &&
-                        thumbnailUploadStatus &&
-                        modFormStatus
+                        !(
+                            versionFormStatus &&
+                            thumbnailUploadStatus &&
+                            modFormStatus
+                        )
                     }>
                     CREATE PROJECT
                 </Button>
