@@ -20,10 +20,32 @@ import fetcher from "../utils/fetcher"
 const CreateMod = () => {
     const [versionFormStatus, setVersionFormStatus] = useState<boolean>(true)
     const [thumbnailUploadStatus, setThumbnailUploadStatus] =
-        useState<boolean>(true)
+        useState<boolean>(false)
     const [modFormStatus, setModFormStatus] = useState<boolean>(false)
     const [modId, setModId] = useState<string>("")
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+
+    const uploadThumbnail = () => {
+        if (thumbnailFile !== null) {
+            fetcher(`mod/new_thumbnail/${modId}`)
+                .then(res => {
+                    const url = res.url
+                    fetch(url, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "image/png",
+                        },
+                        body: thumbnailFile,
+                    }).then(res => {
+                        console.log("Uploaded thumbnail")
+                        setThumbnailUploadStatus(true)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    }
 
     useEffect(() => {
         fetcher("/mod/generate_id").then(res => {
@@ -111,13 +133,12 @@ const CreateMod = () => {
                                 </Text>
                                 <FileInput
                                     onChange={(files: File | null) => {
-                                        console.log(files)
                                         setThumbnailFile(files)
                                     }}
                                     value={thumbnailFile}
                                     icon={<Upload />}
                                     accept="
-                                        image/png,image/jpeg"
+                                        image/png"
                                     variant="filled"
                                     placeholder="Select a Thumbnail to upload..."
                                     styles={theme => ({
@@ -155,6 +176,7 @@ const CreateMod = () => {
                                 </Flex>
 
                                 <Button
+                                    onClick={uploadThumbnail}
                                     disabled={thumbnailFile === null}
                                     color="accent.2"
                                     size="lg">
