@@ -4,6 +4,7 @@ import { Button, Flex, Text, Title } from "@mantine/core"
 import dayjs from "dayjs"
 import { ModPage } from "../interfaces/Mod"
 import { Download } from "react-feather"
+import fetcher from "../utils/fetcher"
 
 interface VersionCardProps {
     version: Version
@@ -12,6 +13,14 @@ interface VersionCardProps {
 
 const VersionCard = (props: VersionCardProps) => {
     const { version, currentMod } = props
+
+    const incrementDownloadCount = () => {
+        fetcher(
+            `version/increment/${currentMod?.mod_id}/${version.version_id}`,
+        ).then(res => {
+            console.log(res)
+        })
+    }
 
     return (
         <Flex
@@ -55,13 +64,14 @@ const VersionCard = (props: VersionCardProps) => {
             </Flex>
 
             <Button
-                onClick={() =>
+                onClick={() => {
                     window.open(
                         `${import.meta.env.VITE_ORBIT_VERSION_URI}/${
                             version.file_url
                         }`,
                     )
-                }
+                    incrementDownloadCount()
+                }}
                 color="green"
                 pl={10}
                 pr={0}
