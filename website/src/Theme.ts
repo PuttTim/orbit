@@ -45,7 +45,7 @@ const theme: MantineThemeOverride = {
         ],
         red: [
             "rgba(175, 84, 86, 0.1)",
-            "rgba(175, 84, 86, 0.2)",
+            "rgba(250, 84, 86, 0.9)",
             "rgba(175, 84, 86, 0.3)",
             "rgba(175, 84, 86, 0.4)",
             "rgba(175, 84, 86, 0.5)",

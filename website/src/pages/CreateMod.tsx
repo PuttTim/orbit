@@ -12,6 +12,9 @@ import {
     Image,
     AspectRatio,
     Dialog,
+    TextInput,
+    Select,
+    Radio,
 } from "@mantine/core"
 import { useEffect, useState } from "react"
 import { Check, Trash, Upload, X } from "react-feather"
@@ -19,6 +22,7 @@ import useSWR from "swr"
 import fetcher from "../utils/fetcher"
 import { useAppStore } from "../app/store"
 import { useNavigate } from "react-router-dom"
+import { useForm } from "@mantine/form"
 
 interface DialogText {
     content: string
@@ -29,13 +33,39 @@ const CreateMod = () => {
     const navigate = useNavigate()
 
     // Form validation states
-    const [versionFormStatus, setVersionFormStatus] = useState<boolean>(true)
+    const [versionFormStatus, setVersionFormStatus] = useState<boolean>(false)
     const [thumbnailUploadStatus, setThumbnailUploadStatus] =
         useState<boolean>(false)
     const [modFormStatus, setModFormStatus] = useState<boolean>(false)
 
     // Form related states
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+    const [versionFile, setVersionFile] = useState<File | null>(null)
+    const versionForm = useForm({
+        validateInputOnChange: true,
+        initialValues: {
+            mod_version: "",
+            game_version: "",
+            stage: "",
+        },
+        validate: {
+            mod_version: value => {
+                if (value === "") {
+                    return "Mod version is required"
+                }
+            },
+            game_version: value => {
+                if (value === "") {
+                    return "Game version is required"
+                }
+            },
+            stage: value => {
+                if (value === "") {
+                    return "Stage is required"
+                }
+            },
+        },
+    })
 
     // General use states
     const [modId, setModId] = useState<string>("")
@@ -45,6 +75,7 @@ const CreateMod = () => {
 
     const uploadThumbnail = () => {
         if (thumbnailFile !== null) {
+            console.log("Uploading thumbnail")
             fetcher(`mod/new_thumbnail/${modId}`)
                 .then(res => {
                     const url = res.url
@@ -74,15 +105,66 @@ const CreateMod = () => {
         }
     }
 
+    const uploadVersion = () => {
+        // console.log(versionFile)
+        // console.log(versionForm.values)
+        if (versionFile !== null && versionForm.isValid()) {
+            console.log("Uploading version")
+            fetch(
+                `${import.meta.env.VITE_ORBIT_API_URI}/version/create/${modId}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        ...versionForm.values,
+                        file_url: `${modId}/${versionFile.name}`,
+                    }),
+                },
+            ).then(res => {
+                res.json().then(value => {
+                    fetcher(
+                        `version/new_file/${modId}/${value.versionId}/${versionFile.name}`,
+                    )
+                        .then(res => {
+                            const url = res.url
+                            fetch(url, {
+                                method: "PUT",
+                                body: versionFile,
+                            }).then(res => {
+                                console.log("Uploaded version")
+                                setVersionFormStatus(true)
+                                setDialogText({
+                                    content:
+                                        "Version Release created & uploaded successfully",
+                                    type: "success",
+                                })
+                                setOpened(true)
+                            })
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            setOpened(true)
+                            setDialogText({
+                                content: "Failed to upload version",
+                                type: "error",
+                            })
+                        })
+                })
+            })
+        }
+    }
+
     useEffect(() => {
         fetcher("/mod/generate_id").then(res => {
             setModId(res.mod_id)
         })
 
-        if (userData["cognito:username"] === undefined) {
-            console.log("User is not logged in")
-            navigate("/")
-        }
+        // if (userData["cognito:username"] === undefined) {
+        //     console.log("User is not logged in")
+        //     navigate("/")
+        // }
     }, [])
 
     useEffect(() => {
@@ -166,7 +248,99 @@ const CreateMod = () => {
                                 </Title>
                             </Flex>
                         </Accordion.Control>
-                        <Accordion.Panel>AA</Accordion.Panel>
+                        <Accordion.Panel>
+                            <Flex direction="column" gap="16px">
+                                <TextInput
+                                    onChange={event => {
+                                        versionForm.setFieldValue(
+                                            "mod_version",
+                                            event.target.value,
+                                        )
+                                    }}
+                                    withAsterisk
+                                    label={"Mod Version"}
+                                    variant="filled"
+                                    styles={theme => ({
+                                        input: {
+                                            backgroundColor:
+                                                theme.colors.primary[9],
+                                        },
+                                    })}
+                                />
+                                <TextInput
+                                    onChange={event => {
+                                        versionForm.setFieldValue(
+                                            "game_version",
+                                            event.target.value,
+                                        )
+                                    }}
+                                    withAsterisk
+                                    label={"Game Version"}
+                                    variant="filled"
+                                    styles={theme => ({
+                                        input: {
+                                            backgroundColor:
+                                                theme.colors.primary[9],
+                                        },
+                                    })}
+                                />
+                                <Radio.Group
+                                    onChange={value => {
+                                        versionForm.setFieldValue(
+                                            "stage",
+                                            value,
+                                        )
+                                    }}
+                                    name="stage"
+                                    label="Select Release Stage">
+                                    <Radio
+                                        value="alpha"
+                                        label="Alpha"
+                                        color="accent"
+                                    />
+                                    <Radio
+                                        value="beta"
+                                        label="Beta"
+                                        color="accent"
+                                    />
+                                    <Radio
+                                        value="release"
+                                        label="Release"
+                                        color="accent"
+                                    />
+                                </Radio.Group>
+                                <FileInput
+                                    withAsterisk
+                                    label="File"
+                                    onChange={(files: File | null) => {
+                                        console.log(files?.name)
+
+                                        setVersionFile(files)
+                                    }}
+                                    value={versionFile}
+                                    icon={<Upload />}
+                                    accept="
+                                        .txt,.jar"
+                                    variant="filled"
+                                    placeholder="Select a File to upload..."
+                                    styles={theme => ({
+                                        input: {
+                                            backgroundColor:
+                                                theme.colors.primary[9],
+                                        },
+                                    })}
+                                />
+                                <Button
+                                    onClick={uploadVersion}
+                                    disabled={
+                                        !(versionForm.isValid() && versionFile)
+                                    }
+                                    color="accent.2"
+                                    size="lg">
+                                    CREATE VERSION RELEASE
+                                </Button>
+                            </Flex>
+                        </Accordion.Panel>
                     </Accordion.Item>
                     <Accordion.Item value="thumbnail">
                         <Accordion.Control>
@@ -186,13 +360,9 @@ const CreateMod = () => {
                         </Accordion.Control>
                         <Accordion.Panel>
                             <Flex direction="column" gap="16px">
-                                <Text fz="lg">
-                                    Thumbnail File{" "}
-                                    <Text span color="red.8">
-                                        *
-                                    </Text>
-                                </Text>
                                 <FileInput
+                                    withAsterisk
+                                    label="Thumbnail"
                                     onChange={(files: File | null) => {
                                         setThumbnailFile(files)
                                     }}
@@ -209,7 +379,7 @@ const CreateMod = () => {
                                         },
                                     })}
                                 />
-                                <Text fz="lg">Preview</Text>
+                                <Text fz="md">Preview</Text>
                                 <Flex align="center" gap="20px">
                                     <AspectRatio
                                         ratio={160 / 160}
