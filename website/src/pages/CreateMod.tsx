@@ -270,6 +270,7 @@ const CreateMod = () => {
             console.log(res)
             if (res.status === 200) {
                 console.log("Mod created")
+                navigate(`/mod/${modForm.values.name}`)
             }
         })
 
@@ -354,10 +355,10 @@ const CreateMod = () => {
             setModId(res.mod_id)
         })
 
-        // if (userData["cognito:username"] === undefined) {
-        //     console.log("User is not logged in")
-        //     navigate("/")
-        // }
+        if (userData["cognito:username"] === undefined) {
+            console.log("User is not logged in")
+            navigate("/")
+        }
     }, [])
 
     useEffect(() => {
