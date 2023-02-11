@@ -107,7 +107,7 @@ const Mods = () => {
                 break
             case "created":
                 resultData = resultData?.sort((a, b) => {
-                    return parseInt(a.created_on) - parseInt(b.created_on)
+                    return parseInt(b.created_on) - parseInt(a.created_on)
                 })
                 console.log("sort by created")
                 break
