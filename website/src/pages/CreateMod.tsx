@@ -11,11 +11,17 @@ import {
     Text,
     Image,
     AspectRatio,
+    Dialog,
 } from "@mantine/core"
 import { useEffect, useState } from "react"
 import { Check, Trash, Upload, X } from "react-feather"
 import useSWR from "swr"
 import fetcher from "../utils/fetcher"
+
+interface DialogText {
+    content: string
+    type: "error" | "success"
+}
 
 const CreateMod = () => {
     const [versionFormStatus, setVersionFormStatus] = useState<boolean>(true)
@@ -24,6 +30,8 @@ const CreateMod = () => {
     const [modFormStatus, setModFormStatus] = useState<boolean>(false)
     const [modId, setModId] = useState<string>("")
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+    const [opened, setOpened] = useState<boolean>(false)
+    const [dialogText, setDialogText] = useState<DialogText>()
 
     const uploadThumbnail = () => {
         if (thumbnailFile !== null) {
@@ -39,10 +47,19 @@ const CreateMod = () => {
                     }).then(res => {
                         console.log("Uploaded thumbnail")
                         setThumbnailUploadStatus(true)
+                        setDialogText({
+                            content: "Thumbnail uploaded successfully",
+                            type: "success",
+                        })
+                        setOpened(true)
                     })
                 })
                 .catch(err => {
                     console.log(err)
+                    setDialogText({
+                        content: "Failed to upload thumbnail",
+                        type: "error",
+                    })
                 })
         }
     }
@@ -53,8 +70,37 @@ const CreateMod = () => {
         })
     }, [])
 
+    useEffect(() => {
+        if (opened) {
+            setTimeout(() => {
+                setOpened(false)
+            }, 2000)
+        }
+    }, [opened])
+
     return (
         <>
+            <Dialog
+                bg={dialogText?.type === "error" ? "highlight.0" : "green.8"}
+                opened={opened}
+                onClose={() => {
+                    setOpened(false)
+                    setDialogText(undefined)
+                }}>
+                <Flex
+                    gap="20px"
+                    onClick={() => {
+                        setOpened(false)
+                    }}
+                    sx={{ borderRadius: "8px", cursor: "pointer" }}>
+                    {dialogText?.type === "error" ? (
+                        <X color="white" size={24} />
+                    ) : (
+                        <Check color="white" size={24} />
+                    )}
+                    <Title order={5}>{dialogText?.content}</Title>
+                </Flex>
+            </Dialog>
             <Flex
                 direction="column"
                 mt="16px"
