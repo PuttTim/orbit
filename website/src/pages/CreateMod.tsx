@@ -205,7 +205,6 @@ const CreateMod = () => {
                     },
                     body: JSON.stringify({
                         ...versionForm.values,
-                        file_url: `${modId}/${versionFile.name}`,
                     }),
                 },
             ).then(res => {
@@ -225,6 +224,22 @@ const CreateMod = () => {
                                 body: versionFile,
                             }).then(res => {
                                 console.log("Uploaded version")
+                                fetch(
+                                    `${
+                                        import.meta.env.VITE_ORBIT_API_URI
+                                    }/version/update/${modId}/${
+                                        value.versionId
+                                    }`,
+                                    {
+                                        method: "PUT",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            file_url: `${modId}/${value.versionId}/${versionFile.name}`,
+                                        }),
+                                    },
+                                )
                                 setVersionFormStatus(true)
                                 setDialogText({
                                     content:
@@ -469,7 +484,7 @@ const CreateMod = () => {
                 </Title>
                 <Accordion
                     transitionDuration={200}
-                    defaultValue="mod"
+                    defaultValue="version"
                     radius={8}
                     variant="separated"
                     styles={theme => ({
@@ -686,7 +701,7 @@ const CreateMod = () => {
                                     <X color="red" />
                                 )}
                                 <Title order={3} fw={500}>
-                                    Create & upload a Version Release
+                                    Enter Mod Details
                                 </Title>
                             </Flex>
                         </Accordion.Control>
