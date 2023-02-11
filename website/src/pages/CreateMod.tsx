@@ -17,6 +17,8 @@ import { useEffect, useState } from "react"
 import { Check, Trash, Upload, X } from "react-feather"
 import useSWR from "swr"
 import fetcher from "../utils/fetcher"
+import { useAppStore } from "../app/store"
+import { useNavigate } from "react-router-dom"
 
 interface DialogText {
     content: string
@@ -24,14 +26,22 @@ interface DialogText {
 }
 
 const CreateMod = () => {
+    const navigate = useNavigate()
+
+    // Form validation states
     const [versionFormStatus, setVersionFormStatus] = useState<boolean>(true)
     const [thumbnailUploadStatus, setThumbnailUploadStatus] =
         useState<boolean>(false)
     const [modFormStatus, setModFormStatus] = useState<boolean>(false)
-    const [modId, setModId] = useState<string>("")
+
+    // Form related states
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+
+    // General use states
+    const [modId, setModId] = useState<string>("")
     const [opened, setOpened] = useState<boolean>(false)
     const [dialogText, setDialogText] = useState<DialogText>()
+    const userData = useAppStore(state => state.data)
 
     const uploadThumbnail = () => {
         if (thumbnailFile !== null) {
@@ -68,6 +78,11 @@ const CreateMod = () => {
         fetcher("/mod/generate_id").then(res => {
             setModId(res.mod_id)
         })
+
+        if (userData["cognito:username"] === undefined) {
+            console.log("User is not logged in")
+            navigate("/")
+        }
     }, [])
 
     useEffect(() => {
