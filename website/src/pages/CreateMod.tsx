@@ -16,13 +16,16 @@ import {
     Select,
     Radio,
     MultiSelect,
+    Modal,
 } from "@mantine/core"
 import { useEffect, useState } from "react"
 import {
     Check,
+    Edit,
     GitHub,
     Info,
     MessageSquare,
+    Save,
     Trash,
     Upload,
     X,
@@ -38,6 +41,8 @@ import {
     ExternalLinks,
     LinkNames,
 } from "../interfaces/Mod"
+import MDEditor from "@uiw/react-md-editor"
+import rehypeSanitize from "rehype-sanitize"
 
 interface DialogText {
     content: string
@@ -148,7 +153,8 @@ const CreateMod = () => {
 
     // General use states
     const [modId, setModId] = useState<string>("")
-    const [opened, setOpened] = useState<boolean>(false)
+    const [openedDialog, setOpenedDialog] = useState<boolean>(false)
+    const [openedModal, setOpenedModal] = useState<boolean>(false)
     const [dialogText, setDialogText] = useState<DialogText>()
     const userData = useAppStore(state => state.data)
 
@@ -171,7 +177,7 @@ const CreateMod = () => {
                             content: "Thumbnail uploaded successfully",
                             type: "success",
                         })
-                        setOpened(true)
+                        setOpenedDialog(true)
                     })
                 })
                 .catch(err => {
@@ -219,12 +225,12 @@ const CreateMod = () => {
                                         "Version Release created & uploaded successfully",
                                     type: "success",
                                 })
-                                setOpened(true)
+                                setOpenedDialog(true)
                             })
                         })
                         .catch(err => {
                             console.log(err)
-                            setOpened(true)
+                            setOpenedDialog(true)
                             setDialogText({
                                 content: "Failed to upload version",
                                 type: "error",
@@ -296,7 +302,7 @@ const CreateMod = () => {
                         content: "Valid URL",
                         type: "success",
                     })
-                    setOpened(true)
+                    setOpenedDialog(true)
                 }
 
                 updateExternalLinks(type, link)
@@ -307,7 +313,7 @@ const CreateMod = () => {
                 content: "Invalid URL",
                 type: "error",
             })
-            setOpened(true)
+            setOpenedDialog(true)
         }
     }
 
@@ -323,30 +329,30 @@ const CreateMod = () => {
     }, [])
 
     useEffect(() => {
-        if (opened) {
+        if (openedDialog) {
             setTimeout(() => {
-                setOpened(false)
+                setOpenedDialog(false)
             }, 2000)
         }
-    }, [opened])
+    }, [openedDialog])
 
     useEffect(() => {
-        console.log("Mod form changed", externalLinks)
-    }, [externalLinks])
+        console.log(modForm.values.detail)
+    }, [modForm.values.detail])
 
     return (
         <>
             <Dialog
                 bg={dialogText?.type === "error" ? "highlight.0" : "green.8"}
-                opened={opened}
+                opened={openedDialog}
                 onClose={() => {
-                    setOpened(false)
+                    setOpenedDialog(false)
                     setDialogText(undefined)
                 }}>
                 <Flex
                     gap="20px"
                     onClick={() => {
-                        setOpened(false)
+                        setOpenedDialog(false)
                     }}
                     sx={{ borderRadius: "8px", cursor: "pointer" }}>
                     {dialogText?.type === "error" ? (
@@ -357,6 +363,43 @@ const CreateMod = () => {
                     <Title order={5}>{dialogText?.content}</Title>
                 </Flex>
             </Dialog>
+            <Modal
+                centered
+                size="60%"
+                overlayOpacity={0.7}
+                title="Your mod Details (in Markdown)"
+                opened={openedModal}
+                onClose={() => {
+                    setOpenedModal(false)
+                }}
+                styles={theme => ({
+                    modal: {
+                        borderRadius: "8px",
+                        backgroundColor: theme.colors.primary[9],
+                    },
+                })}>
+                <Flex direction="column" gap="16px" h="100%">
+                    <MDEditor
+                        height={500}
+                        value={modForm.values.detail}
+                        onChange={value => {
+                            modForm.setFieldValue("detail", value || "")
+                        }}
+                        previewOptions={{
+                            rehypePlugins: [[rehypeSanitize]],
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            setOpenedModal(false)
+                        }}
+                        leftIcon={<Save />}
+                        w="100%"
+                        color="accent.2">
+                        SAVE
+                    </Button>
+                </Flex>
+            </Modal>
             <Flex
                 direction="column"
                 mt="16px"
@@ -595,7 +638,11 @@ const CreateMod = () => {
                             {" "}
                             <Flex direction="column" gap="16px">
                                 <Flex w="100%" h="100%" gap="40px">
-                                    <Box w="50%" h="100%">
+                                    <Flex
+                                        direction="column"
+                                        gap="8px"
+                                        w="50%"
+                                        h="100%">
                                         <TextInput
                                             onChange={event => {
                                                 modForm.setFieldValue(
@@ -669,8 +716,26 @@ const CreateMod = () => {
                                                 },
                                             })}
                                         />
-                                    </Box>
-                                    <Box w="50%" h="100%">
+                                        <Flex direction="column">
+                                            <Text fz="md" mb="8px">
+                                                Project Details
+                                            </Text>
+                                            <Button
+                                                onClick={() => {
+                                                    setOpenedModal(true)
+                                                }}
+                                                leftIcon={<Edit />}
+                                                w="50%"
+                                                color="primary.9">
+                                                Open Details Editor
+                                            </Button>
+                                        </Flex>
+                                    </Flex>
+                                    <Flex
+                                        direction="column"
+                                        gap="8px"
+                                        w="50%"
+                                        h="100%">
                                         {" "}
                                         <MultiSelect
                                             label="Category Tags"
@@ -761,7 +826,7 @@ const CreateMod = () => {
                                                 },
                                             })}
                                         />
-                                    </Box>
+                                    </Flex>
                                 </Flex>
                             </Flex>
                         </Accordion.Panel>
