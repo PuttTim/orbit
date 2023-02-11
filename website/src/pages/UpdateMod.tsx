@@ -40,10 +40,11 @@ import {
     EnvTags,
     ExternalLinks,
     LinkNames,
+    ModPage,
 } from "../interfaces/Mod"
 import MDEditor from "@uiw/react-md-editor"
 import rehypeSanitize from "rehype-sanitize"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface DialogText {
     content: string
@@ -78,45 +79,34 @@ const selectStyles = (theme: any) => ({
     },
 })
 
-const UpdateMod = (mod: any) => {
+interface UpdateModProps {
+    modData: ModPage
+    close: () => void
+}
+
+const UpdateMod = (props: UpdateModProps) => {
+    const modData = props.modData
+    const navigate = useNavigate()
     // Form related states
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
     const [versionFile, setVersionFile] = useState<File | null>(null)
-    const [externalLinks, setExternalLinks] = useState<ExternalLinks[]>([])
-    const [envTags, setEnvTags] = useState<string[]>([])
-    const [categoryTags, setCategoryTags] = useState<string[]>([])
-    const [contributors, setContributors] = useState<string[]>([])
-    const versionForm = useForm({
-        validateInputOnChange: true,
-        initialValues: {
-            mod_version: "",
-            game_version: "",
-            stage: "",
-        },
-        validate: {
-            mod_version: value => {
-                if (value === "") {
-                    return "Mod version is required"
-                }
-            },
-            game_version: value => {
-                if (value === "") {
-                    return "Game version is required"
-                }
-            },
-            stage: value => {
-                if (value === "") {
-                    return "Stage is required"
-                }
-            },
-        },
-    })
+    const [externalLinks, setExternalLinks] = useState<ExternalLinks[]>(
+        modData.external_links || [],
+    )
+    const [envTags, setEnvTags] = useState<string[]>(modData.env_tags)
+    const [categoryTags, setCategoryTags] = useState<string[]>(
+        modData.category_tags,
+    )
+    const [contributors, setContributors] = useState<string[]>(
+        modData.contributors || [],
+    )
     const modForm = useForm({
         validateInputOnChange: true,
         initialValues: {
-            name: "",
-            summary: "",
-            detail: "",
+            name: modData.name,
+            summary: modData.summary,
+            detail: modData.detail,
+            creator: modData.creator,
         },
         validate: {
             detail: (value: string) => {
@@ -134,11 +124,16 @@ const UpdateMod = (mod: any) => {
                     return "Summary is required"
                 }
             },
+            creator: (value: string) => {
+                if (value === "") {
+                    return "Creator is required"
+                }
+            },
         },
     })
 
     // General use states
-    const [modId, setModId] = useState<string>("")
+    const [modId, setModId] = useState<string>(modData.mod_id)
     const [openedDialog, setOpenedDialog] = useState<boolean>(false)
     const [openedModal, setOpenedModal] = useState<boolean>(false)
     const userData = useAppStore(state => state.data)
@@ -217,8 +212,8 @@ const UpdateMod = (mod: any) => {
         }
     }
 
-    const createMod = () => {
-        console.log("Creating mod")
+    const updateMod = () => {
+        console.log("Updating mod")
         let data
         data = {
             ...modForm.values,
@@ -227,11 +222,11 @@ const UpdateMod = (mod: any) => {
             category_tags: categoryTags,
             contributors,
             created_on: Date.now(),
-            creator: userData["cognito:username"],
-            thumbnail_url: `/thumbnail/${modId}/icon.png`,
         }
-        fetch(`${import.meta.env.VITE_ORBIT_API_URI}/mod/create/${modId}`, {
-            method: "POST",
+        console.log(data)
+
+        fetch(`${import.meta.env.VITE_ORBIT_API_URI}/mod/update/${modId}`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -239,12 +234,14 @@ const UpdateMod = (mod: any) => {
         }).then(res => {
             console.log(res)
             if (res.status === 200) {
-                console.log("Mod created")
+                console.log("Mod updated")
+                navigate(`/mods`)
             }
         })
 
-        console.log(data)
+        // console.log(data)
     }
+
     return (
         <>
             <Dialog
@@ -317,6 +314,7 @@ const UpdateMod = (mod: any) => {
                 <Flex w="100%" h="100%" gap="40px">
                     <Flex direction="column" gap="8px" w="50%" h="100%">
                         <TextInput
+                            value={modForm.values.name}
                             onChange={event => {
                                 modForm.setFieldValue(
                                     "name",
@@ -334,6 +332,7 @@ const UpdateMod = (mod: any) => {
                             })}
                         />
                         <TextInput
+                            value={modForm.values.summary}
                             onChange={event => {
                                 modForm.setFieldValue(
                                     "summary",
@@ -351,6 +350,7 @@ const UpdateMod = (mod: any) => {
                             })}
                         />
                         <TextInput
+                            value={modForm.values.creator}
                             onChange={event => {
                                 console.log("do nothing")
                             }}
@@ -358,7 +358,6 @@ const UpdateMod = (mod: any) => {
                             label="Project Owner"
                             variant="filled"
                             withAsterisk
-                            value={userData?.["cognito:username"]}
                             styles={theme => ({
                                 input: {
                                     backgroundColor: theme.colors.primary[9],
@@ -366,6 +365,7 @@ const UpdateMod = (mod: any) => {
                             })}
                         />
                         <TextInput
+                            value={contributors}
                             placeholder="Vazkii, RWTema, ..."
                             onChange={event => {
                                 setContributors(
@@ -403,6 +403,7 @@ const UpdateMod = (mod: any) => {
                     <Flex direction="column" gap="8px" w="50%" h="100%">
                         {" "}
                         <MultiSelect
+                            value={categoryTags}
                             withAsterisk
                             maxSelectedValues={3}
                             label="Category Tags"
@@ -424,6 +425,7 @@ const UpdateMod = (mod: any) => {
                             styles={selectStyles}
                         />
                         <MultiSelect
+                            value={envTags}
                             withAsterisk
                             label="Mod Environment Tags"
                             variant="filled"
@@ -435,6 +437,11 @@ const UpdateMod = (mod: any) => {
                             styles={selectStyles}
                         />
                         <TextInput
+                            value={
+                                externalLinks.find(
+                                    link => link.type === "github",
+                                )?.link
+                            }
                             label="GitHub Link"
                             placeholder="https://github.com/VazkiiMods/Quark"
                             icon={<GitHub />}
@@ -452,6 +459,10 @@ const UpdateMod = (mod: any) => {
                             })}
                         />
                         <TextInput
+                            value={
+                                externalLinks.find(link => link.type === "wiki")
+                                    ?.link
+                            }
                             label="Mod Wiki"
                             placeholder="https://quarkmod.net/#features"
                             icon={<Info />}
@@ -466,6 +477,11 @@ const UpdateMod = (mod: any) => {
                             })}
                         />
                         <TextInput
+                            value={
+                                externalLinks.find(
+                                    link => link.type === "discord",
+                                )?.link
+                            }
                             label="Discord Server"
                             placeholder="https://discord.gg/quark"
                             icon={<MessageSquare />}
@@ -484,6 +500,16 @@ const UpdateMod = (mod: any) => {
                         />
                     </Flex>
                 </Flex>
+                <Button
+                    disabled={!modForm.isValid()}
+                    onClick={() => {
+                        if (modForm.isValid()) {
+                            updateMod()
+                        }
+                    }}
+                    color="accent.4">
+                    CONFIRM UPDATE
+                </Button>
             </Flex>
         </>
     )

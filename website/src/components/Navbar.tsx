@@ -121,6 +121,7 @@ const Navbar = () => {
                             <Button
                                 onClick={() => {
                                     wipeData()
+                                    navigate("/")
                                 }}
                                 leftIcon={<User />}
                                 styles={theme => ({
