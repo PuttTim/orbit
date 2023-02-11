@@ -25,7 +25,7 @@ interface Mod {
     creator: string
     created_on: string
     thumbnail_url: string
-    last_updated: number
+    last_updated: number | string
     game_version: string
     downloads: number
     env_tags: EnvTags[]

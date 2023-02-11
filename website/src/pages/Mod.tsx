@@ -310,8 +310,7 @@ const Mod = () => {
                                         <Title order={4}>Created On</Title>
                                         <Title order={3}>
                                             {dayjs(
-                                                parseInt(modData.created_on) *
-                                                    1000,
+                                                parseInt(modData.created_on),
                                             ).format("DD/MM/YYYY")}
                                         </Title>
                                     </Flex>
@@ -327,8 +326,7 @@ const Mod = () => {
                                         <Title order={4}>Last Updated</Title>
                                         <Title order={3}>
                                             {dayjs(
-                                                parseInt(modData.last_updated) *
-                                                    1000,
+                                                parseInt(modData.last_updated),
                                             ).format("DD/MM/YYYY")}
                                         </Title>
                                     </Flex>
@@ -570,7 +568,6 @@ const Mod = () => {
                                     </Flex>
                                 )}
                             </Flex>
-                            {/* TODO: REPLACE WITH USER'S AUTH CHECKING */}
                             {userData !== undefined &&
                             userData["cognito:username"] === modData.creator ? (
                                 <>

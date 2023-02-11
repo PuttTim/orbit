@@ -57,9 +57,7 @@ const VersionCard = (props: VersionCardProps) => {
                     {`MC ${version.game_version}`}
                 </Title>
                 <Title order={6} fw={400}>
-                    {dayjs(parseInt(version.timestamp) * 1000).format(
-                        "DD/MM/YYYY",
-                    )}
+                    {dayjs(parseInt(version.timestamp)).format("DD/MM/YYYY")}
                 </Title>
             </Flex>
 

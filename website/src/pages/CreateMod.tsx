@@ -24,6 +24,7 @@ import {
     Edit,
     GitHub,
     Info,
+    Loader,
     MessageSquare,
     Save,
     Trash,
@@ -46,17 +47,7 @@ import rehypeSanitize from "rehype-sanitize"
 
 interface DialogText {
     content: string
-    type: "error" | "success"
-}
-
-interface ModForm {
-    category_tags?: CategoryNames[]
-    creator: string
-    detail: string
-    env_tags?: EnvTags[]
-    external_links?: ExternalLinks[]
-    name: string
-    summary: string
+    type: "error" | "success" | "loading"
 }
 
 const selectStyles = (theme: any) => ({
@@ -100,6 +91,9 @@ const CreateMod = () => {
     const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
     const [versionFile, setVersionFile] = useState<File | null>(null)
     const [externalLinks, setExternalLinks] = useState<ExternalLinks[]>([])
+    const [envTags, setEnvTags] = useState<string[]>([])
+    const [categoryTags, setCategoryTags] = useState<string[]>([])
+    const [contributors, setContributors] = useState<string[]>([])
     const versionForm = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -127,25 +121,25 @@ const CreateMod = () => {
     })
     const modForm = useForm({
         validateInputOnChange: true,
+        initialValues: {
+            name: "",
+            summary: "",
+            detail: "",
+        },
         validate: {
             detail: (value: string) => {
                 if (value === "") {
                     return "Detail is required"
                 }
             },
-            name: value => {
+            name: (value: string) => {
                 if (value === "") {
                     return "Name is required"
                 }
             },
-            summary: value => {
+            summary: (value: string) => {
                 if (value === "") {
                     return "Summary is required"
-                }
-            },
-            external_links: value => {
-                if (false) {
-                    return "External links is required"
                 }
             },
         },
@@ -164,6 +158,13 @@ const CreateMod = () => {
             fetcher(`mod/new_thumbnail/${modId}`)
                 .then(res => {
                     const url = res.url
+                    console.log("Uploading thumbnail")
+
+                    setDialogText({
+                        content: "Uploading thumbnail",
+                        type: "loading",
+                    })
+                    setOpenedDialog(true)
                     fetch(url, {
                         method: "PUT",
                         headers: {
@@ -214,6 +215,11 @@ const CreateMod = () => {
                     )
                         .then(res => {
                             const url = res.url
+                            setDialogText({
+                                content: "Uploading version",
+                                type: "loading",
+                            })
+                            setOpenedDialog(true)
                             fetch(url, {
                                 method: "PUT",
                                 body: versionFile,
@@ -239,6 +245,35 @@ const CreateMod = () => {
                 })
             })
         }
+    }
+
+    const createMod = () => {
+        console.log("Creating mod")
+        let data
+        data = {
+            ...modForm.values,
+            external_links: externalLinks,
+            env_tags: envTags,
+            category_tags: categoryTags,
+            contributors,
+            created_on: Date.now(),
+            creator: userData["cognito:username"],
+            thumbnail_url: `/thumbnail/${modId}/icon.png`,
+        }
+        fetch(`${import.meta.env.VITE_ORBIT_API_URI}/mod/create/${modId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }).then(res => {
+            console.log(res)
+            if (res.status === 200) {
+                console.log("Mod created")
+            }
+        })
+
+        console.log(data)
     }
 
     const updateExternalLinks = (type: LinkNames, link: string) => {
@@ -277,14 +312,11 @@ const CreateMod = () => {
 
                 switch (type) {
                     case "github":
-                        console.log(uri)
-
                         if (uri.hostname !== "www.github.com") {
                             throw new Error("Invalid hostname")
                         }
                         break
                     case "discord":
-                        console.log(uri)
                         if (
                             uri.hostname !== "discord.com" &&
                             uri.hostname !== "discord.gg"
@@ -337,13 +369,34 @@ const CreateMod = () => {
     }, [openedDialog])
 
     useEffect(() => {
-        console.log(modForm.values.detail)
-    }, [modForm.values.detail])
+        console.log(modForm.isValid())
+
+        if (
+            modForm.isValid() &&
+            envTags.length > 0 &&
+            categoryTags.length > 0
+        ) {
+            setDialogText({
+                content: "Mod details are valid",
+                type: "success",
+            })
+            setOpenedDialog(true)
+            setModFormStatus(true)
+        } else {
+            setModFormStatus(false)
+        }
+    }, [modForm.isValid(), envTags, categoryTags])
 
     return (
         <>
             <Dialog
-                bg={dialogText?.type === "error" ? "highlight.0" : "green.8"}
+                bg={
+                    dialogText?.type === "error"
+                        ? "highlight.0"
+                        : dialogText?.type === "success"
+                        ? "green.8"
+                        : "accent.9"
+                }
                 opened={openedDialog}
                 onClose={() => {
                     setOpenedDialog(false)
@@ -357,8 +410,10 @@ const CreateMod = () => {
                     sx={{ borderRadius: "8px", cursor: "pointer" }}>
                     {dialogText?.type === "error" ? (
                         <X color="white" size={24} />
-                    ) : (
+                    ) : dialogText?.type === "success" ? (
                         <Check color="white" size={24} />
+                    ) : (
+                        <Loader color="white" size={24} />
                     )}
                     <Title order={5}>{dialogText?.content}</Title>
                 </Flex>
@@ -624,7 +679,7 @@ const CreateMod = () => {
                                 justify="flex-start"
                                 align="center"
                                 gap="16px">
-                                {versionFormStatus ? (
+                                {modFormStatus ? (
                                     <Check color="green" />
                                 ) : (
                                     <X color="red" />
@@ -700,8 +755,7 @@ const CreateMod = () => {
                                         <TextInput
                                             placeholder="Vazkii, RWTema, ..."
                                             onChange={event => {
-                                                modForm.setFieldValue(
-                                                    "contributors",
+                                                setContributors(
                                                     event.target.value
                                                         .replace(/ /g, "")
                                                         .split(","),
@@ -718,7 +772,10 @@ const CreateMod = () => {
                                         />
                                         <Flex direction="column">
                                             <Text fz="md" mb="8px">
-                                                Project Details
+                                                Project Details{" "}
+                                                <Text span color="red">
+                                                    *
+                                                </Text>
                                             </Text>
                                             <Button
                                                 onClick={() => {
@@ -738,13 +795,12 @@ const CreateMod = () => {
                                         h="100%">
                                         {" "}
                                         <MultiSelect
+                                            withAsterisk
+                                            maxSelectedValues={3}
                                             label="Category Tags"
                                             variant="filled"
                                             onChange={event => {
-                                                modForm.setFieldValue(
-                                                    "category_tags",
-                                                    event,
-                                                )
+                                                setCategoryTags(event)
                                             }}
                                             placeholder="Select Category"
                                             data={[
@@ -760,13 +816,11 @@ const CreateMod = () => {
                                             styles={selectStyles}
                                         />
                                         <MultiSelect
+                                            withAsterisk
                                             label="Mod Environment Tags"
                                             variant="filled"
                                             onChange={event => {
-                                                modForm.setFieldValue(
-                                                    "env_tags",
-                                                    event,
-                                                )
+                                                setEnvTags(event)
                                             }}
                                             placeholder="Server..."
                                             data={["Server", "Client"]}
@@ -833,6 +887,9 @@ const CreateMod = () => {
                     </Accordion.Item>
                 </Accordion>
                 <Button
+                    onClick={() => {
+                        createMod()
+                    }}
                     size="lg"
                     color="accent.4"
                     disabled={

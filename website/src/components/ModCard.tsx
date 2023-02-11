@@ -152,17 +152,17 @@ export const ModCard = (mod: Mod) => {
                         <Flex gap="4px">
                             <Calendar />
                             <Text fw={500}>
-                                {`${dayjs(
-                                    parseInt(mod.created_on) * 1000,
-                                ).format("DD/MM/YYYY")} created on`}
+                                {`${dayjs(parseInt(mod.created_on)).format(
+                                    "DD/MM/YYYY",
+                                )} created on`}
                             </Text>
                         </Flex>
                         <Flex gap="4px">
                             <RefreshCw />
                             <Text fw={500}>
-                                {`${dayjs(mod.last_updated * 1000).format(
-                                    "DD/MM/YYYY",
-                                )} last updated`}
+                                {`${dayjs(
+                                    parseInt(mod.last_updated as string),
+                                ).format("DD/MM/YYYY")} last updated`}
                             </Text>
                         </Flex>
                         <Flex direction="row" gap="8px">
