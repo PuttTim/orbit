@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar"
 import Auth from "./pages/Auth"
 import { useLocalStorage } from "@mantine/hooks"
 import { useAppStore } from "./app/store"
+import CreateMod from "./pages/CreateMod"
 
 function App() {
     const setData = useAppStore(state => state.setData)
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/mods" element={<Mods />} />
                     <Route path="/mod/:mod_name" element={<Mod />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/create/mod" element={<CreateMod />} />
                     <Route path="*" element={<PageNotFound />} />
                 </Routes>
             </Box>

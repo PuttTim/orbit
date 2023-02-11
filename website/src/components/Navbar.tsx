@@ -110,6 +110,9 @@ const Navbar = () => {
                     {userData["cognito:username"] !== undefined ? (
                         <>
                             <Button
+                                onClick={() => {
+                                    navigate("/create/mod")
+                                }}
                                 leftIcon={<Plus />}
                                 color="accent.4"
                                 mr="20px">
@@ -132,7 +135,7 @@ const Navbar = () => {
                                         },
                                     },
                                 })}>
-                                {userData["cognito:username"]}
+                                {userData["cognito:username"]} | Logout
                             </Button>
                         </>
                     ) : (
