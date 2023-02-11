@@ -55,6 +55,13 @@ const VersionCard = (props: VersionCardProps) => {
             </Flex>
 
             <Button
+                onClick={() =>
+                    window.open(
+                        `${import.meta.env.VITE_ORBIT_VERSION_URI}/${
+                            version.file_url
+                        }`,
+                    )
+                }
                 color="green"
                 pl={10}
                 pr={0}
