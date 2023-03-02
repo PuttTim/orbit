@@ -6,7 +6,7 @@ I **do not own** any of the mods and any mods shown here is purely for dmeonstra
 
 This application is my submission for my Year 2 Semester 2 project in Polytechnic.
 
-Muicroservices built using: [AWS](https://aws.amazon.com/) Amplify, API Gateway, Cognito, CloudFront, DynamoDB, Lambdas, S3
+Microservices built using: [AWS](https://aws.amazon.com/) Amplify, API Gateway, Cognito, CloudFront, DynamoDB, Lambdas, S3
 
 Frontend built using: [ReactJS (with TypeScript)](https://reactjs.org/), [MantineUI](https://mantine.dev), [zustand](https://github.com/pmndrs/zustand/), [SWR](https://swr.vercel.app/)
 
